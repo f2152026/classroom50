@@ -1,0 +1,73 @@
+name: Collect Scores
+
+# Teacher-triggered workflow. Iterates the (member, assignment)
+# Cartesian product of the classroom GitHub teams' members ×
+# <classroom>/assignments.json (the teams are authoritative for
+# enrollment; roster.csv is optional display metadata). The polled
+# members are the union of the STUDENT team and the STAFF teams
+# (teacher/hta/ta), so a staff member who accepted an assignment to test
+# the autograde flow is collected like a student — staff who never
+# accepted have no repo, hence no releases, hence no entry. It pages
+# through each expected `<classroom>-<assignment>-<username>` repo's
+# `submit/*` releases and downloads `result.json` from each. Single-writer
+# by design — no concurrent ingest, no per-student dispatch event, no broad
+# cross-repo write secret.
+
+on:
+  workflow_dispatch:
+    inputs:
+      classroom:
+        description: "Classroom short-name (leave blank to collect all)"
+        required: false
+  schedule:
+    # Nightly autopilot. Comment out the next line if you only want
+    # manual triggers.
+    - cron: "17 4 * * *"
+
+permissions:
+  contents: write       # write scores.json + commit
+
+concurrency:
+  group: collect-${{ github.event.inputs.classroom || 'all' }}
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+
+      - name: Collect scores
+        env:
+          # Fine-grained PAT. Needs Organization -> Members: Read
+          # (collection is team-driven and lists the classroom team's
+          # members), Repository -> Contents: Read and write on
+          # <classroom>-* student repos, and Repository ->
+          # Administration: Read and write (collection grants staff teams
+          # — e.g., TAs — read access to student repos and private
+          # templates via PUT teams/.../repos/...). Collection READS
+          # (team members, releases + result.json) and grants team access;
+          # the contents-write scope is shared with regrade.yaml, which
+          # pushes submit/* tags.
+          # Rotated via `gh teacher rotate-service-token <org>`.
+          CLASSROOM50_SERVICE_TOKEN: ${{ secrets.CLASSROOM50_SERVICE_TOKEN }}
+          # Optional restriction to a single classroom; empty
+          # means "collect all classrooms in this config repo".
+          CLASSROOM_FILTER: ${{ github.event.inputs.classroom || '' }}
+        run: python3 .github/scripts/collect_scores.py
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          if [ -n "$(git status --porcelain '*/scores.json' 2>/dev/null)" ]; then
+            git add '*/scores.json'
+            git -c user.name=classroom50-bot -c user.email=bot@classroom50 \
+                commit -m "[Classroom 50] collect: refresh scores.json"
+            git push
+          else
+            echo "no scores.json changes to commit"
+          fi
