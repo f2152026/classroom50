@@ -1,0 +1,25 @@
+{
+  "schema": "classroom50/classroom/v1",
+  "name": "test DD classroom",
+  "short_name": "test-dd-classroom",
+  "term": "",
+  "org": "f2152026",
+  "team": {
+    "id": 18943051,
+    "slug": "classroom50-test-dd-classroom"
+  },
+  "teams": {
+    "teacher": {
+      "id": 18943053,
+      "slug": "classroom50-test-dd-classroom-teacher"
+    },
+    "hta": {
+      "id": 18943054,
+      "slug": "classroom50-test-dd-classroom-hta"
+    },
+    "ta": {
+      "id": 18943055,
+      "slug": "classroom50-test-dd-classroom-ta"
+    }
+  }
+}
