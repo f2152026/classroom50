@@ -39,6 +39,13 @@
         "repo": "csf342-labs-template",
         "branch": "main"
       },
+      "available_from": "2026-08-16T19:40:00Z",
+      "available_from_meta": {
+        "input": "2026-08-17T01:10:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
       "tests": [
         {
           "name": "Lab 1 Task 1 - Structural Full Adder",
