@@ -73,6 +73,62 @@
         }
       ],
       "submission_mode": "every-push"
+    },
+    {
+      "slug": "at-1",
+      "name": "at-1",
+      "mode": "individual",
+      "autograder": "default",
+      "feedback_pr": true,
+      "copy_about": true,
+      "copy_topics": true,
+      "template": {
+        "owner": "f2152026",
+        "repo": "cs-215-digital-design-labs",
+        "branch": "main"
+      },
+      "available_from": "2026-08-17T06:11:00Z",
+      "available_from_meta": {
+        "input": "2026-08-17T11:41:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
+      "runtime": {
+        "apt": [
+          "iverilog"
+        ]
+      },
+      "allowed_files": [
+        "labs/lab*/*/dut.v"
+      ],
+      "tests": [
+        {
+          "name": "Lab 1 Task 1 - AND Gate",
+          "type": "run",
+          "run": "./scripts/test_runner.sh lab01 task1 tb_task1.v",
+          "points": 10
+        },
+        {
+          "name": "Lab 1 Task 2 - OR Gate",
+          "type": "run",
+          "run": "./scripts/test_runner.sh lab01 task2 tb_task2.v",
+          "points": 10
+        },
+        {
+          "name": "Lab 1 Task 3 - NOT Gate",
+          "type": "run",
+          "run": "./scripts/test_runner.sh lab01 task3 tb_task3.v",
+          "points": 10
+        },
+        {
+          "name": "Lab 1 Task 4 - XOR Gate",
+          "type": "run",
+          "run": "./scripts/test_runner.sh lab01 task4 tb_task4.v",
+          "points": 10
+        }
+      ],
+      "submission_mode": "every-push"
     }
   ]
 }
