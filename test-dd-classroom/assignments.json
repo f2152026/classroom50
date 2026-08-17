@@ -99,9 +99,6 @@
           "iverilog"
         ]
       },
-      "allowed_files": [
-        "labs/lab*/*/dut.v"
-      ],
       "tests": [
         {
           "name": "Lab 1 Task 1 - AND Gate",
