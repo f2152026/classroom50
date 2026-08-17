@@ -10,6 +10,428 @@
       "type": "individual",
       "entries": [],
       "collected_at": "2026-08-17T04:28:27Z"
+    },
+    "at-1": {
+      "type": "individual",
+      "entries": [
+        {
+          "owner": "gengar-fan",
+          "first_name": "Gengar-fan",
+          "submissions": [
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-17T06-46-25Z-584618e",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/commit/584618ebb7de706c89659bedb0c86ef5fba8dc29",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/releases/tag/submit%2F2026-08-17T06-46-25Z-584618e",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/compare/4a6409cb40e70d0ac36598242f5dc0c0a4450222...584618ebb7de706c89659bedb0c86ef5fba8dc29",
+              "datetime": "2026-08-17T06:45:28Z",
+              "graded_at": "2026-08-17T06:46:50Z",
+              "score": 40,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-17T06-45-30Z-e064a9a",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/commit/e064a9a8e472fc12bb0827efa4e2af56b68fbbcb",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/releases/tag/submit%2F2026-08-17T06-45-30Z-e064a9a",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/compare/4a6409cb40e70d0ac36598242f5dc0c0a4450222...e064a9a8e472fc12bb0827efa4e2af56b68fbbcb",
+              "datetime": "2026-08-17T06:45:12Z",
+              "graded_at": "2026-08-17T06:45:57Z",
+              "score": 40,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-17T06-40-04Z-3b0c6ec",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/commit/3b0c6ec47726771057e87d40837f75fa686137ec",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/releases/tag/submit%2F2026-08-17T06-40-04Z-3b0c6ec",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/compare/4a6409cb40e70d0ac36598242f5dc0c0a4450222...3b0c6ec47726771057e87d40837f75fa686137ec",
+              "datetime": "2026-08-17T06:39:26Z",
+              "graded_at": "2026-08-17T06:40:28Z",
+              "score": 0,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-17T06-39-15Z-5a5510b",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/commit/5a5510bd5062416ae431a48635543e9914ad8171",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/releases/tag/submit%2F2026-08-17T06-39-15Z-5a5510b",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/compare/4a6409cb40e70d0ac36598242f5dc0c0a4450222...5a5510bd5062416ae431a48635543e9914ad8171",
+              "datetime": "2026-08-17T06:38:54Z",
+              "graded_at": "2026-08-17T06:39:37Z",
+              "score": 0,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-17T06-37-55Z-330bbac",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/commit/330bbac9cfa219f4b9466af32c39af7540027779",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/releases/tag/submit%2F2026-08-17T06-37-55Z-330bbac",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/compare/4a6409cb40e70d0ac36598242f5dc0c0a4450222...330bbac9cfa219f4b9466af32c39af7540027779",
+              "datetime": "2026-08-17T06:37:27Z",
+              "graded_at": "2026-08-17T06:38:23Z",
+              "score": 0,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-17T06-37-03Z-150dada",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/commit/150dadae7d0d159ad5340609df87f8bebad16699",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/releases/tag/submit%2F2026-08-17T06-37-03Z-150dada",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-gengar-fan/compare/4a6409cb40e70d0ac36598242f5dc0c0a4450222...150dadae7d0d159ad5340609df87f8bebad16699",
+              "datetime": "2026-08-17T06:36:49Z",
+              "graded_at": "2026-08-17T06:37:29Z",
+              "score": 0,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            }
+          ]
+        },
+        {
+          "owner": "we-all-live-in-a-yellow-submarine",
+          "submissions": [
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "we-all-live-in-a-yellow-submarine",
+              "submission": "submit/2026-08-17T07-17-50Z-f754798",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/commit/f7547982de86330f9f35f89c086ef27be0a911a1",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/releases/tag/submit%2F2026-08-17T07-17-50Z-f754798",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/compare/484c992a2ccd6f7e62af941b8b4a2d3bcd5db1e1...f7547982de86330f9f35f89c086ef27be0a911a1",
+              "datetime": "2026-08-17T07:16:46Z",
+              "graded_at": "2026-08-17T07:18:13Z",
+              "score": 20,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "we-all-live-in-a-yellow-submarine",
+                "id": 317673235
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "we-all-live-in-a-yellow-submarine",
+              "submission": "submit/2026-08-17T07-16-51Z-bf5d53a",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/commit/bf5d53a67bb844484ac078da8bb87c814d095fe4",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/releases/tag/submit%2F2026-08-17T07-16-51Z-bf5d53a",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/compare/484c992a2ccd6f7e62af941b8b4a2d3bcd5db1e1...bf5d53a67bb844484ac078da8bb87c814d095fe4",
+              "datetime": "2026-08-17T07:16:26Z",
+              "graded_at": "2026-08-17T07:17:24Z",
+              "score": 10,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "we-all-live-in-a-yellow-submarine",
+                "id": 317673235
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "we-all-live-in-a-yellow-submarine",
+              "submission": "submit/2026-08-17T07-15-56Z-de5fe07",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/commit/de5fe07c4cf9c1a3df0834d5373fae07b62acefc",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/releases/tag/submit%2F2026-08-17T07-15-56Z-de5fe07",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/compare/484c992a2ccd6f7e62af941b8b4a2d3bcd5db1e1...de5fe07c4cf9c1a3df0834d5373fae07b62acefc",
+              "datetime": "2026-08-17T07:15:38Z",
+              "graded_at": "2026-08-17T07:16:25Z",
+              "score": 10,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "we-all-live-in-a-yellow-submarine",
+                "id": 317673235
+              },
+              "late": false
+            }
+          ]
+        }
+      ],
+      "collected_at": "2026-08-17T07:18:55Z"
     }
   }
 }
