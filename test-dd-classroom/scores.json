@@ -4,12 +4,12 @@
     "test-assignment": {
       "type": "individual",
       "entries": [],
-      "collected_at": "2026-08-17T04:28:27Z"
+      "collected_at": "2026-08-18T04:28:10Z"
     },
     "a1": {
       "type": "individual",
       "entries": [],
-      "collected_at": "2026-08-17T04:28:27Z"
+      "collected_at": "2026-08-18T04:28:10Z"
     },
     "at-1": {
       "type": "individual",
@@ -298,6 +298,51 @@
               "classroom": "test-dd-classroom",
               "assignment_type": "individual",
               "owner": "we-all-live-in-a-yellow-submarine",
+              "submission": "submit/2026-08-17T07-18-39Z-60622a0",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/commit/60622a030fb3eaf565b99df4405dd5cd443a53f3",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/releases/tag/submit%2F2026-08-17T07-18-39Z-60622a0",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/compare/484c992a2ccd6f7e62af941b8b4a2d3bcd5db1e1...60622a030fb3eaf565b99df4405dd5cd443a53f3",
+              "datetime": "2026-08-17T07:17:51Z",
+              "graded_at": "2026-08-17T07:19:10Z",
+              "score": 20,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "we-all-live-in-a-yellow-submarine",
+                "id": 317673235
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "we-all-live-in-a-yellow-submarine",
               "submission": "submit/2026-08-17T07-17-50Z-f754798",
               "commit": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/commit/f7547982de86330f9f35f89c086ef27be0a911a1",
               "release": "https://github.com/f2152026/test-dd-classroom-at-1-we-all-live-in-a-yellow-submarine/releases/tag/submit%2F2026-08-17T07-17-50Z-f754798",
@@ -429,9 +474,59 @@
               "late": false
             }
           ]
+        },
+        {
+          "owner": "hollandspiderman3-afk",
+          "submissions": [
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "hollandspiderman3-afk",
+              "submission": "submit/2026-08-17T11-44-33Z-d5c9396",
+              "commit": "https://github.com/f2152026/test-dd-classroom-at-1-hollandspiderman3-afk/commit/d5c9396d49647a1826ee17e5c3bc9344f8ba1ba4",
+              "release": "https://github.com/f2152026/test-dd-classroom-at-1-hollandspiderman3-afk/releases/tag/submit%2F2026-08-17T11-44-33Z-d5c9396",
+              "review": "https://github.com/f2152026/test-dd-classroom-at-1-hollandspiderman3-afk/compare/1b9ba1190f996c6795546d4d1819d0760c05e389...d5c9396d49647a1826ee17e5c3bc9344f8ba1ba4",
+              "datetime": "2026-08-17T11:44:16Z",
+              "graded_at": "2026-08-17T11:44:58Z",
+              "score": 10,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "hollandspiderman3-afk",
+                "id": 317881169
+              },
+              "late": false
+            }
+          ]
         }
       ],
-      "collected_at": "2026-08-17T07:18:55Z"
+      "collected_at": "2026-08-18T04:28:10Z"
     }
   }
 }
