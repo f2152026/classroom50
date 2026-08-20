@@ -253,6 +253,48 @@
         }
       ],
       "submission_mode": "every-push"
+    },
+    {
+      "slug": "i-write-bugs",
+      "name": "i-write-bugs",
+      "mode": "individual",
+      "autograder": "default",
+      "feedback_pr": true,
+      "copy_about": true,
+      "copy_topics": true,
+      "template": {
+        "owner": "f2152026",
+        "repo": "cs-215-digital-design-labs",
+        "branch": "main"
+      },
+      "due": "2026-08-19T19:00:00Z",
+      "due_meta": {
+        "input": "2026-08-20T00:30:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
+      "available_from": "2026-08-20T16:00:00Z",
+      "available_from_meta": {
+        "input": "2026-08-20T21:30:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
+      "runtime": {
+        "apt": [
+          "iverilog"
+        ]
+      },
+      "tests": [
+        {
+          "name": "Lab 1 Task 1 - AND Gate",
+          "type": "run",
+          "run": "./scripts/test_runner.sh lab01 task1 .hidden-tests/lab01/hidden_tb_task1.v",
+          "points": 10
+        }
+      ],
+      "submission_mode": "every-push"
     }
   ]
 }
