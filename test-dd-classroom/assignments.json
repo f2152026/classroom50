@@ -133,6 +133,22 @@
         }
       ],
       "submission_mode": "every-push"
+    },
+    {
+      "slug": "gg",
+      "name": "gg",
+      "mode": "individual",
+      "autograder": "default",
+      "feedback_pr": true,
+      "no_autograder": true,
+      "copy_about": true,
+      "copy_topics": true,
+      "template": {
+        "owner": "f2152026",
+        "repo": "cs-215-digital-design-labs",
+        "branch": "main"
+      },
+      "submission_mode": "every-push"
     }
   ]
 }
