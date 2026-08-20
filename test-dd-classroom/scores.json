@@ -527,6 +527,108 @@
         }
       ],
       "collected_at": "2026-08-20T04:28:09Z"
+    },
+    "hj": {
+      "type": "individual",
+      "entries": [
+        {
+          "owner": "gengar-fan",
+          "first_name": "Gengar-fan",
+          "submissions": [
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-20T15-38-48Z-b15574b",
+              "commit": "https://github.com/f2152026/test-dd-classroom-hj-gengar-fan/commit/b15574b5bd09f019d7445802c346e09bdd9aa158",
+              "release": "https://github.com/f2152026/test-dd-classroom-hj-gengar-fan/releases/tag/submit%2F2026-08-20T15-38-48Z-b15574b",
+              "review": "https://github.com/f2152026/test-dd-classroom-hj-gengar-fan/compare/dd82c826304969f3d04c1d6f2efe38990271ee99...b15574b5bd09f019d7445802c346e09bdd9aa158",
+              "datetime": "2026-08-20T15:38:31Z",
+              "graded_at": "2026-08-20T15:39:15Z",
+              "score": 0,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-20T15-35-13Z-7248628",
+              "commit": "https://github.com/f2152026/test-dd-classroom-hj-gengar-fan/commit/72486284ad961227d0d84987cb06f5ab6c36297b",
+              "release": "https://github.com/f2152026/test-dd-classroom-hj-gengar-fan/releases/tag/submit%2F2026-08-20T15-35-13Z-7248628",
+              "review": "https://github.com/f2152026/test-dd-classroom-hj-gengar-fan/compare/dd82c826304969f3d04c1d6f2efe38990271ee99...72486284ad961227d0d84987cb06f5ab6c36297b",
+              "datetime": "2026-08-20T15:34:56Z",
+              "graded_at": "2026-08-20T15:35:36Z",
+              "score": 0,
+              "max-score": 40,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 3 - NOT Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 4 - XOR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            }
+          ]
+        }
+      ],
+      "collected_at": "2026-08-20T15:40:13Z"
     }
   }
 }
