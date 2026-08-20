@@ -921,14 +921,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Fetch Hidden Testbenches
-        if: ${{ secrets.TESTS_DEPLOY_KEY != '' }}
-        uses: actions/checkout@v7
-        with:
-          repository: ${{ github.repository_owner }}/cs-215-hidden-tests
-          token: ${{ secrets.TESTS_DEPLOY_KEY }}
-          path: .hidden-tests
-
       # === Language toolchains (driven by `runtime:` in assignments.json) ===
       # All gated on a hosted runner: `runner.environment` is resolved on the
       # actual runner at step time and is 'self-hosted' | 'github-hosted'. A
