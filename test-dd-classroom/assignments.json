@@ -295,6 +295,15 @@
           "setup": "printf '`timescale 1ns/1ps\\nmodule tb;\\nreg a,b;\\nwire y;\\ndut uut(.a(a),.b(b),.y(y));\\ninitial begin\\na=0;b=0;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=0;b=1;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=1;b=0;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=1;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\n$display(\"ALL_TESTS_PASSED\");$finish;\\nend\\nendmodule\\n' > labs/lab01/task1/hidden_tb.v && ./scripts/compile.sh lab01 task1 labs/lab01/task1/hidden_tb.v",
           "comparison": "included",
           "expected": "ALL_TESTS_PASSED"
+        },
+        {
+          "name": "Lab 1 Task 2 - OR Gate",
+          "type": "io",
+          "run": "./scripts/run.sh lab01 task2 labs/lab01/task2/hidden_tb.v",
+          "points": 10,
+          "setup": "printf '`timescale 1ns/1ps\\nmodule tb;\\nreg a,b;\\nwire y;\\ndut uut(.a(a),.b(b),.y(y));\\ninitial begin\\na=0;b=0;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=0;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;b=0;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\n$display(\"ALL_TESTS_PASSED\");$finish;\\nend\\nendmodule\\n' > labs/lab01/task2/hidden_tb.v && ./scripts/compile.sh lab01 task2 labs/lab01/task2/hidden_tb.v",
+          "comparison": "included",
+          "expected": "ALL_TESTS_PASSED"
         }
       ],
       "submission_mode": "every-push"
