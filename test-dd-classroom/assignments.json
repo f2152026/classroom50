@@ -226,16 +226,6 @@
           "iverilog"
         ]
       },
-      "allowed_files": [
-        "*",
-        "!labs/",
-        "!labs/lab*/",
-        "!labs/lab*/*/",
-        "!labs/lab*/*/dut.v",
-        "!labs/lab*/*/tb.v",
-        "!.specstory/",
-        "!.specstory/**"
-      ],
       "tests": [
         {
           "name": "Lab 1 Task 1 - AND Gate",
