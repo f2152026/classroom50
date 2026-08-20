@@ -170,8 +170,6 @@ SOURCE_OPENABLE = (SOURCE_ACCEPT, SOURCE_ROOT)
 ALLOWED_FILES_KEEP_PREFIXES = (
     ".github/",
     ".git/",
-    ".hidden-tests/",
-    ".specstory/",
 )
 ALLOWED_FILES_KEEP_EXACT = (
     ACCEPT_MARKER_PATH,
