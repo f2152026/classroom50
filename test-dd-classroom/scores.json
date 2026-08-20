@@ -642,6 +642,219 @@
               "classroom": "test-dd-classroom",
               "assignment_type": "individual",
               "owner": "gengar-fan",
+              "submission": "submit/2026-08-20T19-29-41Z-02b322c",
+              "commit": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/commit/02b322c0fcf4ecbc289c917868886cebaaf790bd",
+              "release": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/releases/tag/submit%2F2026-08-20T19-29-41Z-02b322c",
+              "review": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/compare/9b009968545c464200c7a4773208a526acb85e21...02b322c0fcf4ecbc289c917868886cebaaf790bd",
+              "datetime": "2026-08-20T19:29:25Z",
+              "graded_at": "2026-08-20T19:30:11Z",
+              "score": 20,
+              "max-score": 20,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-20T19-05-58Z-b546f79",
+              "commit": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/commit/b546f798887af333f70c05c99a1419516a6f2763",
+              "release": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/releases/tag/submit%2F2026-08-20T19-05-58Z-b546f79",
+              "review": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/compare/9b009968545c464200c7a4773208a526acb85e21...b546f798887af333f70c05c99a1419516a6f2763",
+              "datetime": "2026-08-20T19:05:44Z",
+              "graded_at": "2026-08-20T19:06:31Z",
+              "score": 20,
+              "max-score": 20,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-20T19-03-03Z-1130082",
+              "commit": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/commit/1130082e740181a82844574810c7b68d14491075",
+              "release": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/releases/tag/submit%2F2026-08-20T19-03-03Z-1130082",
+              "review": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/compare/9b009968545c464200c7a4773208a526acb85e21...1130082e740181a82844574810c7b68d14491075",
+              "datetime": "2026-08-20T19:02:48Z",
+              "graded_at": "2026-08-20T19:03:36Z",
+              "score": 10,
+              "max-score": 20,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-20T18-51-38Z-00dec2b",
+              "commit": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/commit/00dec2bf02978ef0180182006879dd7c954ceb2c",
+              "release": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/releases/tag/submit%2F2026-08-20T18-51-38Z-00dec2b",
+              "review": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/compare/9b009968545c464200c7a4773208a526acb85e21...00dec2bf02978ef0180182006879dd7c954ceb2c",
+              "datetime": "2026-08-20T18:51:24Z",
+              "graded_at": "2026-08-20T18:52:00Z",
+              "score": 20,
+              "max-score": 20,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Lab 1 Task 2 - OR Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-20T18-41-31Z-9b689d2",
+              "commit": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/commit/9b689d23908df0654800522ab2a0c952cd43f39d",
+              "release": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/releases/tag/submit%2F2026-08-20T18-41-31Z-9b689d2",
+              "review": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/compare/9b009968545c464200c7a4773208a526acb85e21...9b689d23908df0654800522ab2a0c952cd43f39d",
+              "datetime": "2026-08-20T18:41:13Z",
+              "graded_at": "2026-08-20T18:41:55Z",
+              "score": 10,
+              "max-score": 10,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-20T18-36-59Z-bfa1217",
+              "commit": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/commit/bfa1217c07cbb635782cd7fdd4360933a458a315",
+              "release": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/releases/tag/submit%2F2026-08-20T18-36-59Z-bfa1217",
+              "review": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/compare/9b009968545c464200c7a4773208a526acb85e21...bfa1217c07cbb635782cd7fdd4360933a458a315",
+              "datetime": "2026-08-20T18:36:41Z",
+              "graded_at": "2026-08-20T18:37:39Z",
+              "score": 0,
+              "max-score": 10,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-20T18-32-22Z-3585c61",
+              "commit": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/commit/3585c61aa4e84deb5d6138704482c6bff0f9f311",
+              "release": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/releases/tag/submit%2F2026-08-20T18-32-22Z-3585c61",
+              "review": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/compare/9b009968545c464200c7a4773208a526acb85e21...3585c61aa4e84deb5d6138704482c6bff0f9f311",
+              "datetime": "2026-08-20T18:32:05Z",
+              "graded_at": "2026-08-20T18:32:55Z",
+              "score": 0,
+              "max-score": 10,
+              "tests": [
+                {
+                  "test-name": "Lab 1 Task 1 - AND Gate",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
               "submission": "submit/2026-08-20T18-26-27Z-87cbe11",
               "commit": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/commit/87cbe11dd08766bb53589bf94dfceecf0cfce7e3",
               "release": "https://github.com/f2152026/test-dd-classroom-i-write-bugs-gengar-fan/releases/tag/submit%2F2026-08-20T18-26-27Z-87cbe11",
@@ -829,7 +1042,7 @@
           ]
         }
       ],
-      "collected_at": "2026-08-20T18:28:37Z"
+      "collected_at": "2026-08-20T20:15:40Z"
     }
   }
 }
