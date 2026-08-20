@@ -1183,6 +1183,22 @@ jobs:
             -f description="Feedback PR step could not run (could not fetch ensure_feedback_pr.py from Pages)" \
             -f target_url="$RUN_URL" >/dev/null 2>&1 || true
 
+      - name: Send Email Notification
+        if: always()
+        env:
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_SMTP_SERVER: ${{ secrets.EMAIL_SMTP_SERVER }}
+          EMAIL_SMTP_PORT: ${{ secrets.EMAIL_SMTP_PORT }}
+        run: |
+          if [ -f "scripts/send_email.py" ]; then
+            echo "✉️ Found send_email.py. Executing..."
+            python3 scripts/send_email.py
+          else
+            echo "ℹ️ send_email.py not found in the student workspace. Skipping email notification."
+          fi
+
+
   # === Move the "latest" pointer forward ===
   # Latest = the most recent SUBMISSION EVENT, not the newest commit:
   # every published submission release claims the badge, so grading an
