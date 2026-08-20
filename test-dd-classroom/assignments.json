@@ -163,6 +163,36 @@
         "source": "auto-detected"
       },
       "submission_mode": "every-push"
+    },
+    {
+      "slug": "a22",
+      "name": "a22",
+      "mode": "individual",
+      "autograder": "default",
+      "feedback_pr": true,
+      "no_autograder": true,
+      "copy_about": true,
+      "copy_topics": true,
+      "template": {
+        "owner": "f2152026",
+        "repo": "cs-215-digital-design-labs",
+        "branch": "main"
+      },
+      "due": "2026-08-20T13:57:00Z",
+      "due_meta": {
+        "input": "2026-08-20T19:27:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
+      "available_from": "2026-08-20T08:57:00Z",
+      "available_from_meta": {
+        "input": "2026-08-20T14:27:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
+      "submission_mode": "every-push"
     }
   ]
 }
