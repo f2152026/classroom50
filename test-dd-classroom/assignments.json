@@ -193,6 +193,71 @@
         "source": "auto-detected"
       },
       "submission_mode": "every-push"
+    },
+    {
+      "slug": "hj",
+      "name": "hj",
+      "mode": "individual",
+      "autograder": "default",
+      "feedback_pr": true,
+      "copy_about": true,
+      "copy_topics": true,
+      "template": {
+        "owner": "f2152026",
+        "repo": "cs-215-digital-design-labs",
+        "branch": "main"
+      },
+      "due": "2026-08-20T17:26:00Z",
+      "due_meta": {
+        "input": "2026-08-20T22:56:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
+      "available_from": "2026-08-20T15:26:00Z",
+      "available_from_meta": {
+        "input": "2026-08-20T20:56:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
+      "runtime": {
+        "apt": [
+          "iverilog"
+        ]
+      },
+      "allowed_files": [
+        "labs/lab*/*/dut.v",
+        "labs/lab*/*/tb.v",
+        ".specstory/**"
+      ],
+      "tests": [
+        {
+          "name": "Lab 1 Task 1 - AND Gate",
+          "type": "run",
+          "run": "./scripts/test_runner.sh lab01 task1 .hidden-tests/lab01/hidden_tb_task1.v",
+          "points": 10
+        },
+        {
+          "name": "Lab 1 Task 2 - OR Gate",
+          "type": "run",
+          "run": "./scripts/test_runner.sh lab01 task2 .hidden-tests/lab01/hidden_tb_task2.v",
+          "points": 10
+        },
+        {
+          "name": "Lab 1 Task 3 - NOT Gate",
+          "type": "run",
+          "run": "./scripts/test_runner.sh lab01 task3 .hidden-tests/lab01/hidden_tb_task3.v",
+          "points": 10
+        },
+        {
+          "name": "Lab 1 Task 4 - XOR Gate",
+          "type": "run",
+          "run": "./scripts/test_runner.sh lab01 task4 .hidden-tests/lab01/hidden_tb_task4.v",
+          "points": 10
+        }
+      ],
+      "submission_mode": "every-push"
     }
   ]
 }
