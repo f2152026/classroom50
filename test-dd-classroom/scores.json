@@ -4,12 +4,12 @@
     "test-assignment": {
       "type": "individual",
       "entries": [],
-      "collected_at": "2026-08-19T04:28:27Z"
+      "collected_at": "2026-08-20T04:28:09Z"
     },
     "a1": {
       "type": "individual",
       "entries": [],
-      "collected_at": "2026-08-19T04:28:27Z"
+      "collected_at": "2026-08-20T04:28:09Z"
     },
     "at-1": {
       "type": "individual",
@@ -526,7 +526,7 @@
           ]
         }
       ],
-      "collected_at": "2026-08-19T04:28:27Z"
+      "collected_at": "2026-08-20T04:28:09Z"
     }
   }
 }
