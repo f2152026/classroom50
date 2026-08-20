@@ -227,9 +227,14 @@
         ]
       },
       "allowed_files": [
-        "labs/lab*/*/dut.v",
-        "labs/lab*/*/tb.v",
-        ".specstory/**"
+        "*",
+        "!labs/",
+        "!labs/lab*/",
+        "!labs/lab*/*/",
+        "!labs/lab*/*/dut.v",
+        "!labs/lab*/*/tb.v",
+        "!.specstory/",
+        "!.specstory/**"
       ],
       "tests": [
         {
