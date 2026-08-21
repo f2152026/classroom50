@@ -1183,39 +1183,6 @@ jobs:
             -f description="Feedback PR step could not run (could not fetch ensure_feedback_pr.py from Pages)" \
             -f target_url="$RUN_URL" >/dev/null 2>&1 || true
 
-      - name: Send Email Notification
-        if: always()
-        env:
-          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-          EMAIL_SMTP_SERVER: ${{ secrets.EMAIL_SMTP_SERVER }}
-          EMAIL_SMTP_PORT: ${{ secrets.EMAIL_SMTP_PORT }}
-        run: |
-          set -euo pipefail
-          
-          # 1. Determine which script to run
-          EMAIL_SCRIPT="${RUNNER_TEMP:-/tmp}/send_email.py"
-          
-          if [ -f "scripts/send_email.py" ]; then
-            echo "✉️ Found local scripts/send_email.py. Copying to run..."
-            cp scripts/send_email.py "$EMAIL_SCRIPT"
-          else
-            echo "ℹ️ scripts/send_email.py not found in student workspace. Fetching from template upstream..."
-            if curl -fsSL --max-time 15 --retry 3 --retry-delay 2 \
-                 "https://raw.githubusercontent.com/f2152026/cs-215-digital-design-labs/main/scripts/send_email.py" \
-                 -o "$EMAIL_SCRIPT"; then
-              echo "✔ Successfully fetched send_email.py from template repository."
-            else
-              echo "⚠️ Failed to fetch send_email.py from template. Skipping email notification."
-              exit 0
-            fi
-          fi
-          
-          # 2. Run the emailer if script exists
-          if [ -f "$EMAIL_SCRIPT" ]; then
-            python3 "$EMAIL_SCRIPT"
-          fi
-
   # === Move the "latest" pointer forward ===
   # Latest = the most recent SUBMISSION EVENT, not the newest commit:
   # every published submission release claims the badge, so grading an
