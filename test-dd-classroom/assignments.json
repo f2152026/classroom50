@@ -267,9 +267,9 @@
         "repo": "cs-215-digital-design-labs",
         "branch": "main"
       },
-      "due": "2026-08-21T04:00:00Z",
+      "due": "2026-08-21T14:00:00Z",
       "due_meta": {
-        "input": "2026-08-21T09:30:00",
+        "input": "2026-08-21T19:30:00",
         "zone": "Asia/Calcutta",
         "offset": "+05:30",
         "source": "auto-detected"
@@ -302,15 +302,6 @@
           "run": "./scripts/run.sh lab01 task2 labs/lab01/task2/hidden_tb.v",
           "points": 10,
           "setup": "printf '`timescale 1ns/1ps\\nmodule tb;\\nreg a,b;\\nwire y;\\ndut uut(.a(a),.b(b),.y(y));\\ninitial begin\\na=0;b=0;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=0;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;b=0;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\n$display(\"ALL_TESTS_PASSED\");$finish;\\nend\\nendmodule\\n' > labs/lab01/task2/hidden_tb.v && ./scripts/compile.sh lab01 task2 labs/lab01/task2/hidden_tb.v",
-          "comparison": "included",
-          "expected": "ALL_TESTS_PASSED"
-        },
-        {
-          "name": "lab2-task1",
-          "type": "io",
-          "run": "./scripts/run.sh lab01 task2 labs/lab01/task2/hidden_tb.v",
-          "points": 10,
-          "setup": "printf '`timescale 1ns/1ps\\nmodule tb;\\nreg a,b;\\nwire y;\\ndut uut(.a(a),.b(b),.y(y));\\ninitial begin\\na=0;b=0;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=0;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;b=0;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\n$display(\"ALL_TESTS_PASSED\");$finish;\\nend\\nendmodule\\n' > labs/lab02/task1/hidden_tb.v && ./scripts/compile.sh lab02 task1 labs/lab02/task1/hidden_tb.v",
           "comparison": "included",
           "expected": "ALL_TESTS_PASSED"
         }
