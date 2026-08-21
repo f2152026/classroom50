@@ -267,9 +267,9 @@
         "repo": "cs-215-digital-design-labs",
         "branch": "main"
       },
-      "due": "2026-08-20T21:00:00Z",
+      "due": "2026-08-21T04:00:00Z",
       "due_meta": {
-        "input": "2026-08-21T02:30:00",
+        "input": "2026-08-21T09:30:00",
         "zone": "Asia/Calcutta",
         "offset": "+05:30",
         "source": "auto-detected"
