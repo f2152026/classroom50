@@ -307,6 +307,73 @@
         }
       ],
       "submission_mode": "every-push"
+    },
+    {
+      "slug": "abcd",
+      "name": "abcd",
+      "mode": "individual",
+      "autograder": "default",
+      "feedback_pr": true,
+      "copy_about": true,
+      "copy_topics": true,
+      "template": {
+        "owner": "f2152026",
+        "repo": "cs-215-digital-design-labs",
+        "branch": "main"
+      },
+      "due": "2026-08-23T04:37:00Z",
+      "due_meta": {
+        "input": "2026-08-23T10:07:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
+      "available_from": "2026-08-22T04:37:00Z",
+      "available_from_meta": {
+        "input": "2026-08-22T10:07:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
+      "tests": [
+        {
+          "name": "Lab 1 Task 1 - AND Gate",
+          "type": "io",
+          "run": "./scripts/run.sh lab01 task1 labs/lab01/task1/hidden_tb.v",
+          "points": 10,
+          "setup": "printf '`timescale 1ns/1ps\\nmodule tb;\\nreg a,b;\\nwire y;\\ndut uut(.a(a),.b(b),.y(y));\\ninitial begin\\na=0;b=0;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=0;b=1;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=1;b=0;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=1;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\n$display(\"ALL_TESTS_PASSED\");$finish;\\nend\\nendmodule\\n' > labs/lab01/task1/hidden_tb.v && ./scripts/compile.sh lab01 task1 labs/lab01/task1/hidden_tb.v",
+          "comparison": "included",
+          "expected": "ALL_TESTS_PASSED"
+        },
+        {
+          "name": "Lab 1 Task 2 - OR Gate",
+          "type": "io",
+          "run": "./scripts/run.sh lab01 task2 labs/lab01/task2/hidden_tb.v",
+          "points": 10,
+          "setup": "printf '`timescale 1ns/1ps\\nmodule tb;\\nreg a,b;\\nwire y;\\ndut uut(.a(a),.b(b),.y(y));\\ninitial begin\\na=0;b=0;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=0;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;b=0;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\n$display(\"ALL_TESTS_PASSED\");$finish;\\nend\\nendmodule\\n' > labs/lab01/task2/hidden_tb.v && ./scripts/compile.sh lab01 task2 labs/lab01/task2/hidden_tb.v",
+          "comparison": "included",
+          "expected": "ALL_TESTS_PASSED"
+        },
+        {
+          "name": "Lab 1 Task 3 - NOT Gate",
+          "type": "io",
+          "run": "./scripts/run.sh lab01 task3 labs/lab01/task3/hidden_tb.v",
+          "points": 10,
+          "setup": "printf '`timescale 1ns/1ps\\nmodule tb;\\nreg a;\\nwire y;\\ndut uut(.a(a),.y(y));\\ninitial begin\\na=0;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\n$display(\"ALL_TESTS_PASSED\");$finish;\\nend\\nendmodule\\n' > labs/lab01/task3/hidden_tb.v && ./scripts/compile.sh lab01 task3 labs/lab01/task3/hidden_tb.v",
+          "comparison": "included",
+          "expected": "ALL_TESTS_PASSED"
+        },
+        {
+          "name": "Lab 1 Task 4 - XOR Gate",
+          "type": "io",
+          "run": "./scripts/run.sh lab01 task4 labs/lab01/task4/hidden_tb.v",
+          "points": 10,
+          "setup": "printf '`timescale 1ns/1ps\\nmodule tb;\\nreg a,b;\\nwire y;\\ndut uut(.a(a),.b(b),.y(y));\\ninitial begin\\na=0;b=0;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\na=0;b=1;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;b=0;#10;if(y!==1)begin $display(\"FAIL\");$finish;end\\na=1;b=1;#10;if(y!==0)begin $display(\"FAIL\");$finish;end\\n$display(\"ALL_TESTS_PASSED\");$finish;\\nend\\nendmodule\\n' > labs/lab01/task4/hidden_tb.v && ./scripts/compile.sh lab01 task4 labs/lab01/task4/hidden_tb.v",
+          "comparison": "included",
+          "expected": "ALL_TESTS_PASSED"
+        }
+      ],
+      "submission_mode": "every-push"
     }
   ]
 }
