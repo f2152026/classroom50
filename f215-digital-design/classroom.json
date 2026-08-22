@@ -1,0 +1,25 @@
+{
+  "schema": "classroom50/classroom/v1",
+  "name": "F215 Digital Design",
+  "short_name": "f215-digital-design",
+  "term": "Sem I 2026",
+  "org": "f2152026",
+  "team": {
+    "id": 19112185,
+    "slug": "classroom50-f215-digital-design"
+  },
+  "teams": {
+    "teacher": {
+      "id": 19112187,
+      "slug": "classroom50-f215-digital-design-teacher"
+    },
+    "hta": {
+      "id": 19112189,
+      "slug": "classroom50-f215-digital-design-hta"
+    },
+    "ta": {
+      "id": 19112191,
+      "slug": "classroom50-f215-digital-design-ta"
+    }
+  }
+}
