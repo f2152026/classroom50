@@ -335,6 +335,11 @@
         "offset": "+05:30",
         "source": "auto-detected"
       },
+      "runtime": {
+        "apt": [
+          "iverilog"
+        ]
+      },
       "tests": [
         {
           "name": "Lab 1 Task 1 - AND Gate",
