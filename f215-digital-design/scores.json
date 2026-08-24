@@ -1,4 +1,10 @@
 {
   "schema": "classroom50/scores/v1",
-  "assignments": {}
+  "assignments": {
+    "dd-2026-verilog-labs": {
+      "type": "individual",
+      "entries": [],
+      "collected_at": "2026-08-24T18:37:27Z"
+    }
+  }
 }
