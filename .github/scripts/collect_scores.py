@@ -85,6 +85,48 @@ SUBMIT_TAG_PREFIX = "submit/"
 # so only the non-owner staff teams — head-TA and TA — need a grant).
 STAFF_TEAM_PERMISSIONS = {"hta": "pull", "ta": "pull"}
 
+# Body markers that identify a rate-limit response, for the cases no header
+# names: GitHub words the secondary limit and the abuse detector differently.
+# "abuse" is the bare stem on purpose — it catches every "abuse detection
+# mechanism" phrasing.
+#
+# The first two mirror Go's ghutil.IsRateLimited; "rate limit exceeded" is a
+# DELIBERATE Python-only extra, a fallback for a primary-limit response whose
+# headers a proxy stripped (Go relies on the header alone).
+# TestRateLimitMarkersParity_GoVsInlinePython pins both sets exactly.
+RATE_LIMIT_BODY_MARKERS = (
+    "secondary rate limit",
+    "rate limit exceeded",
+    "abuse",
+)
+
+# Longest a single retry sleeps: GitHub documents a minute as the secondary
+# limit's minimum wait.
+MAX_RETRY_SLEEP_SECONDS = 60
+
+# Retry-After cap for a plain transient. Tighter than the throttle cap on
+# purpose: nothing about a 500 says a full minute is the right wait.
+TRANSIENT_RETRY_CAP_SECONDS = 30
+
+# How long the whole run may spend asleep waiting out throttles. A throttle that
+# RECOVERS raises nothing, so without a ceiling a few dozen of them silently
+# spend the workflow's `timeout-minutes` and the job is killed mid-run — no
+# summary, no scores.json, no diagnosis. Spending the budget instead surfaces
+# the throttle through the named THROTTLED path.
+MAX_TOTAL_THROTTLE_SLEEP_SECONDS = 300
+
+_throttle_sleep_spent = 0.0
+
+# Bounded read for the error-body snippet: only 300 characters are kept, and a
+# body can come from a proxy or the asset redirect rather than GitHub.
+BODY_SNIPPET_READ_BYTES = 4096
+
+# The vocabulary every HTTP error handler branches on. Plain strings, not an
+# Enum, so the hand-mirrored copy in regrade_repos.py stays literal-for-literal.
+THROTTLED = "throttled"
+FATAL = "fatal"
+SKIPPABLE = "skippable"
+
 RFC3339_RE = re.compile(
     r"^\d{4}-\d{2}-\d{2}T([01]\d|2[0-3]):[0-5]\d:[0-5]\d"
     r"(\.\d+)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)$"
@@ -123,6 +165,17 @@ FULL_ROSTER_HEADER = ",".join(ROSTER_REQUIRED_COLUMNS)
 # Top-level dispatch ----------------------------------------------------------
 
 
+def warn_grant_deferred(classroom_short: str, detail: str) -> None:
+    """The one deferral verdict, for both throttle shapes the grant pass can
+    raise: the run stays green and nothing suggests rotating a credential that
+    is working."""
+    emit_warning(
+        f"{classroom_short}: {detail}. GitHub is throttling, not refusing: "
+        f"the service token is fine, do NOT rotate it. The deferred repos "
+        f"are granted by the next run."
+    )
+
+
 def main() -> int:
     base_dir = pathlib.Path(os.environ.get("GITHUB_WORKSPACE") or ".").resolve()
     classroom_filter = (os.environ.get("CLASSROOM_FILTER") or "").strip()
@@ -158,6 +211,9 @@ def main() -> int:
         print(f"no classrooms found in {base_dir}")
         return 0
 
+    # Read once, on first use, and handed to both passes below (see RepoIndex).
+    repo_index = RepoIndex(api_url, org, service_token)
+
     total_changes = 0
     failed_classrooms: list[str] = []
     # Whether ASSIGNMENT_FILTER named a slug that exists in at least one
@@ -183,6 +239,11 @@ def main() -> int:
             failed_classrooms.append(classroom_short)
             continue
 
+        # One per classroom: both passes below ask for the same student team, and
+        # a per-run cache could serve a stale roster to a later classroom sharing
+        # a team slug.
+        team_members = TeamMembers(api_url, org, service_token)
+
         # Staff-team grant is a SEPARATE, non-fatal pass: it needs Administration
         # (collection doesn't), so its failure must not abort the core job. On
         # failure, warn and mark the classroom failed (non-zero exit) but still
@@ -195,25 +256,44 @@ def main() -> int:
                 classroom_meta=classroom_meta,
                 assignments=assignments,
                 service_token=service_token,
+                repo_index=repo_index,
+                team_members=team_members,
+                assignment_filter=assignment_filter,
             )
+        except GrantThrottled as exc:
+            # NOT a failure: collection is untouched, the pass is idempotent, and
+            # the token is healthy. Each classroom is still retried on its own —
+            # a secondary limit clears in about a minute, so a later grant may
+            # well succeed in this same run.
+            warn_grant_deferred(classroom_short, str(exc))
         except urllib.error.HTTPError as exc:
-            grant_hint = (
-                f" — grant staff teams repo access needs a fine-grained PAT with "
-                f"Repository -> Administration: Read and write; run "
-                f"`gh teacher rotate-service-token {org}`"
-                if exc.code in (401, 403)
-                else ""
-            )
-            emit_error(
-                f"{classroom_short}: staff-team access grant failed with HTTP "
-                f"{exc.code} ({exc.reason or 'no reason'}){grant_hint}. Score "
-                f"collection continues; TAs may not see student repos until this "
-                f"is fixed."
-            )
-            failed_classrooms.append(classroom_short)
+            throttle_reason = rate_limit_reason(exc)
+            if throttle_reason is not None:
+                # Same verdict as GrantThrottled, for a throttle that hit the
+                # pass before it reached its first repo (the team reads).
+                warn_grant_deferred(
+                    classroom_short,
+                    f"staff-team access grant was throttled by GitHub "
+                    f"(HTTP {exc.code}, {throttle_reason})",
+                )
+            else:
+                grant_hint = (
+                    f" — grant staff teams repo access needs a fine-grained PAT with "
+                    f"Repository -> Administration: Read and write; run "
+                    f"`gh teacher rotate-service-token {org}`"
+                    if exc.code in (401, 403)
+                    else ""
+                )
+                emit_error(
+                    f"{classroom_short}: staff-team access grant failed with HTTP "
+                    f"{exc.code} ({exc.reason or 'no reason'}){body_note(exc)}"
+                    f"{grant_hint}. Score collection continues; TAs may not see "
+                    f"student repos until this is fixed."
+                )
+                failed_classrooms.append(classroom_short)
 
         try:
-            updates, mode_flip_assignments, collected = collect_classroom(
+            updates, mode_flip_assignments, collected, detected = collect_classroom(
                 api_url=api_url,
                 org=org,
                 classroom_short=classroom_short,
@@ -222,6 +302,8 @@ def main() -> int:
                 service_token=service_token,
                 roster_meta=load_roster_metadata(base_dir / classroom_short),
                 assignment_filter=assignment_filter,
+                repo_index=repo_index,
+                team_members=team_members,
             )
         except urllib.error.HTTPError as exc:
             # Auth (401/403) and synthetic-network (599) failures on COLLECTION
@@ -231,10 +313,22 @@ def main() -> int:
             # (which would report a broken run as success that collected
             # nothing). The staff-grant pass above is excluded — its
             # Administration scope isn't needed to collect.
-            if exc.code in (401, 403):
+            throttle_reason = rate_limit_reason(exc)
+            if throttle_reason is not None:
+                # A throttle survived the transport's retries. Still fatal —
+                # collection is incomplete — but naming the cause keeps the
+                # operator from rotating a healthy token.
+                emit_error(
+                    f"{classroom_short}: collection was throttled by GitHub "
+                    f"(HTTP {exc.code}, {throttle_reason}) and did not recover after "
+                    f"retrying. The service token is fine, do NOT rotate it; "
+                    f"re-run once the limit resets."
+                )
+            elif exc.code in (401, 403):
                 emit_error(
                     f"{classroom_short}: service token was rejected with HTTP {exc.code} "
-                    f"({exc.reason or 'no reason'}) — run `gh teacher rotate-service-token {org}` "
+                    f"({exc.reason or 'no reason'}){body_note(exc)} — run "
+                    f"`gh teacher rotate-service-token {org}` "
                     f"with a fine-grained PAT scoped to Organization -> Members: Read (collection "
                     f"lists the classroom team's members) AND Repository -> Contents: Read and write "
                     f"(read the student repos' releases; the write scope is shared with regrade)"
@@ -286,7 +380,41 @@ def main() -> int:
             bucket = scores["assignments"].setdefault(
                 slug, {"type": atype, "entries": []}
             )
+            # Keep the bucket type in sync with the manifest-derived mode even
+            # when no entry changed — apply_updates only syncs buckets it
+            # touches, so a detected-only or update-less bucket would otherwise
+            # keep a stale type across a mode flip.
+            bucket["type"] = atype
             bucket["collected_at"] = collected_at
+        # Detected (ungraded) submissions are MERGED per owner, not replaced
+        # wholesale: a repo whose read failed this run isn't in `visited`, so its
+        # prior record survives instead of a transient 500 silently deleting a
+        # recorded submitter (the graded path keeps entries the same way). An
+        # owner that WAS visited and detected nothing has its record dropped, so
+        # a withdrawn submission still disappears. `entries` is left untouched —
+        # these assignments never produce a graded entry.
+        for slug, (atype, records, visited) in detected.items():
+            bucket = scores["assignments"].setdefault(
+                slug, {"type": atype, "entries": []}
+            )
+            before = bucket.get("detected")
+            prior = before if isinstance(before, list) else []
+            merged = [
+                rec
+                for rec in prior
+                if isinstance(rec, dict)
+                and isinstance(rec.get("owner"), str)
+                and rec["owner"].lower() not in visited
+            ]
+            merged.extend(records)
+            merged.sort(key=lambda rec: str(rec.get("owner", "")).lower())
+            # Write [] rather than dropping the key when nothing is detected: the
+            # web distinguishes "collected, nobody submitted" (honest 0 / N) from
+            # "never collected" (absent key) — popping it here would make a real
+            # collect that found no submitters look like no collect at all.
+            bucket["detected"] = merged
+            if bucket.get("detected") != before:
+                n_changes += 1
         try:
             save_scores(scores_path, scores)
         except ScoresFileError as exc:
@@ -405,6 +533,87 @@ def load_roster_metadata(classroom_dir: pathlib.Path) -> dict[str, dict[str, str
 # Per-classroom collection ----------------------------------------------------
 
 
+class RepoIndex:
+    """The org's repos (lowercased name -> `private`), read once per run and only
+    when something asks.
+
+    Both passes walk the (team member × assignment) product — thousands of names
+    for an ordinary course, of which only the accepted ones exist. Collection
+    absorbs the misses quietly (a 404 on /releases reads as "not submitted"), but
+    the grant pass spends two requests and a warning on each, which is what trips
+    GitHub's secondary limit.
+
+    Skipping a name absent from the listing is safe because a fine-grained PAT
+    lists exactly the repos it is scoped to, so that name was going to 404. The
+    premise is load-bearing: a listing that looks complete but omits a readable
+    repo would read a real submission as "not submitted". Both detectable shapes
+    fail open instead — empty reads as unknown, truncated raises
+    IncompleteListing.
+    """
+
+    def __init__(self, api_url: str, org: str, token: str) -> None:
+        self._api_url = api_url
+        self._org = org
+        self._token = token
+        self._repos: dict[str, bool] | None = None
+        self._loaded = False
+
+    def _load(self) -> dict[str, bool] | None:
+        """The repos, or None when the listing could not be read. Reads once; a
+        soft failure warns once and stays None.
+
+        A THROTTLED or FATAL failure propagates and leaves the read UNLATCHED, so
+        a caller that survives it (the grant pass defers a throttle) retries
+        rather than spending the run on the degraded answer."""
+        if self._loaded:
+            return self._repos
+        self._repos = self._read()
+        self._loaded = True
+        return self._repos
+
+    def _read(self) -> dict[str, bool] | None:
+        """One attempt at the org listing."""
+        try:
+            repos = list_org_repos(self._api_url, self._org, self._token)
+        except urllib.error.HTTPError as exc:
+            if classify(exc) is not SKIPPABLE:
+                raise
+            emit_warning(
+                f"{self._org}: could not list the org's repositories: HTTP "
+                f"{exc.code} ({exc.reason or 'no reason'}); falling back to "
+                f"probing every (member, assignment) repo name — slower, and "
+                f"one warning per repo that has not been accepted yet."
+            )
+            return None
+        except (json.JSONDecodeError, ValueError) as exc:
+            emit_warning(
+                f"{self._org}: org repository listing malformed ({exc}); "
+                f"falling back to probing every (member, assignment) repo name."
+            )
+            return None
+        # Unknown, not "nothing exists": a token scoped to zero repos must not
+        # silently skip every poll.
+        if not repos:
+            return None
+        print(f"{self._org}: {len(repos)} repo(s) visible to the service token")
+        return repos
+
+    def contains(self, repo_name: str) -> bool:
+        """Whether `repo_name` exists — True whenever the listing is unknown, so
+        an unreadable index never hides a repo from either pass."""
+        repos = self._load()
+        return repos is None or repo_name.lower() in repos
+
+    def is_private(self, repo_name: str) -> bool | None:
+        """Whether `repo_name` is private, or None when the index can't say (the
+        listing was unreadable, or the name isn't in it). Answers from the
+        listing already read, saving the caller a per-repo request."""
+        repos = self._load()
+        if repos is None:
+            return None
+        return repos.get(repo_name.lower())
+
+
 def is_empty_repo(entry: dict[str, Any]) -> bool:
     """True only when empty_repo is the boolean `true`. The wire contract is a
     JSON boolean (schema type "boolean"; Go decodes into a strict `bool`), so a
@@ -470,12 +679,40 @@ def all_assignment_slugs(assignments: dict[str, Any]) -> list[str]:
     return slugs
 
 
+class TeamMembers:
+    """Team member logins, read once per team per classroom.
+
+    Both passes ask for the same student team — the grant pass to build its
+    target product, collection to build the poll roster — and on a large course
+    that listing is several paginated requests.
+
+    Failures are not cached, so each caller still handles them on its own terms
+    (the grant pass warns and skips; collection propagates a hard error)."""
+
+    def __init__(self, api_url: str, org: str, token: str) -> None:
+        self._api_url = api_url
+        self._org = org
+        self._token = token
+        self._by_slug: dict[str, list[str]] = {}
+
+    def logins(self, team_slug: str) -> list[str]:
+        """`team_slug`'s members. Propagates whatever list_team_member_logins
+        raises."""
+        cached = self._by_slug.get(team_slug)
+        if cached is not None:
+            return list(cached)
+        logins = list_team_member_logins(self._api_url, self._org, team_slug, self._token)
+        self._by_slug[team_slug] = list(logins)
+        return logins
+
+
 def list_enrolled_logins(
     api_url: str,
     org: str,
     classroom_meta: dict[str, Any],
     classroom_short: str,
     service_token: str,
+    team_members: "TeamMembers | None" = None,
 ) -> tuple[list[str], set[str]]:
     """Return (polled logins, student logins). The first is the case-insensitive
     dedup union of the student team and every staff team's members, first-seen
@@ -496,17 +733,18 @@ def list_enrolled_logins(
     team contributes nobody, matching how the staff-grant pass tolerates a
     missing team."""
     student_slug = resolve_team_slug(classroom_meta, classroom_short)
+    read = team_members.logins if team_members is not None else (
+        lambda slug: list_team_member_logins(api_url, org, slug, service_token)
+    )
     # Student team first so its casing wins in the dedup (the repo-name formula
     # lowercases anyway, so casing is cosmetic — but keep it deterministic).
-    student_logins = list_team_member_logins(api_url, org, student_slug, service_token)
+    student_logins = read(student_slug)
     logins = list(student_logins)
     for role, staff_slug in resolve_staff_team_slugs(classroom_meta).items():
         try:
-            logins.extend(
-                list_team_member_logins(api_url, org, staff_slug, service_token)
-            )
+            logins.extend(read(staff_slug))
         except urllib.error.HTTPError as exc:
-            if is_hard_http_error(exc):
+            if classify(exc) is not SKIPPABLE:
                 raise
             emit_warning(
                 f"{classroom_short}: could not read staff team {staff_slug!r} "
@@ -521,6 +759,94 @@ def list_enrolled_logins(
     return _dedupe_logins(logins), {u.strip().lower() for u in student_logins}
 
 
+def collect_detected(
+    *,
+    api_url: str,
+    org: str,
+    classroom_short: str,
+    slug: str,
+    entry: dict[str, Any],
+    team_usernames: list[str],
+    repo_index: "RepoIndex | None",
+    service_token: str,
+) -> tuple[str, list[dict[str, Any]], set[str]]:
+    """Detected submissions for one no_autograder assignment: walk its repos and
+    record presence/count per submitter. Returns (mode, records, visited owners).
+
+    Never records a score — these assignments are not graded. A repo with no
+    detections is OMITTED, so the record list is exactly the submitter set. A
+    per-repo failure warns and skips (same policy as the graded path) so one
+    unreadable repo can't void the assignment; `visited` names the owners whose
+    repo was actually read, so a failed read preserves rather than deletes a
+    prior record.
+    """
+    raw_mode = entry.get("mode")
+    is_group = (raw_mode or "").lower() == "group"
+    assignment_type = "group" if is_group else "individual"
+
+    submission_mode = entry.get("submission_mode")
+    mode = "tag" if submission_mode == "tag" else "every-push"
+    raw_tags = entry.get("submission_tags")
+    submission_tags = [t for t in (raw_tags or []) if isinstance(t, str) and t]
+
+    due_raw = entry.get("due")
+    due = parse_rfc3339(due_raw) if due_raw else None
+    if due_raw and due is None:
+        # Same advisory warning as the graded path — lateness silently absent
+        # would otherwise be indistinguishable from "no due date set".
+        emit_warning(
+            f"{classroom_short}/{slug}: due = {due_raw!r} is not an RFC 3339 "
+            f"timestamp with timezone; skipping late-marking for this assignment"
+        )
+
+    records: list[dict[str, Any]] = []
+    # Owners whose repo this run actually READ (successfully, or as a definite
+    # "not accepted"). A repo skipped because its read FAILED is not here, so
+    # main() can leave that owner's prior record intact rather than deleting a
+    # recorded submitter over a transient 500 — the same warn-and-keep policy the
+    # graded path applies to entries.
+    visited: set[str] = set()
+    # team_usernames arrives already case-insensitively deduped (the
+    # list_enrolled_logins union), so each repo is polled exactly once.
+    for username in team_usernames:
+        repo_name = assignment_repo_name(classroom_short, slug, username)
+        if repo_index is not None and not repo_index.contains(repo_name):
+            # The index says the repo doesn't exist — a definite "not accepted",
+            # not a failed read — so a stale record for it should go.
+            visited.add(username.lower())
+            continue
+        try:
+            detections = detect_repo_submissions(
+                api_url,
+                org,
+                repo_name,
+                service_token,
+                mode,
+                submission_tags,
+            )
+        except urllib.error.HTTPError as exc:
+            if classify(exc) is not SKIPPABLE:
+                raise
+            emit_warning(
+                f"{org}/{repo_name}: submission detection failed: HTTP {exc.code} "
+                f"({exc.reason or 'no reason'}); skipping"
+            )
+            continue
+        except (json.JSONDecodeError, ValueError) as exc:
+            emit_warning(
+                f"{org}/{repo_name}: submission detection malformed ({exc}); skipping"
+            )
+            continue
+        visited.add(username.lower())
+        if not detections:
+            continue
+        record = detected_record(username, detections, due, trust_times=mode != "tag")
+        record["kind"] = "tag" if mode == "tag" else "commit"
+        records.append(record)
+
+    return assignment_type, records, visited
+
+
 def collect_classroom(
     *,
     api_url: str,
@@ -531,17 +857,27 @@ def collect_classroom(
     service_token: str,
     roster_meta: dict[str, dict[str, str]] | None = None,
     assignment_filter: str = "",
-) -> tuple[list[dict[str, Any]], int, dict[str, str]]:
+    repo_index: RepoIndex | None = None,
+    team_members: "TeamMembers | None" = None,
+) -> tuple[
+    list[dict[str, Any]],
+    int,
+    dict[str, str],
+    dict[str, tuple[str, list[dict[str, Any]], set[str]]],
+]:
     """Return (validated result payloads for every (student, assignment) pair,
     count of assignments whose only submissions were rejected by validation,
-    slug -> mode map of the assignments actually walked).
+    slug -> mode map of the assignments actually walked, slug -> (mode, detected
+    records) for assignments that skip grading).
     Per-repo failures warn and skip; hard failures (auth 401/403; network 599)
     propagate and main() converts them to exit 1. The second tuple element lets
     main() distinguish a mode-flip-induced empty result (which has its own loud
     warning) from a token-access problem. The third records which buckets this
     run refreshed — main() stamps their `collected_at` — and stays empty when
     collection was skipped wholesale (team unreadable/empty), so a skipped
-    classroom never reads as freshly collected.
+    classroom never reads as freshly collected. The fourth carries DETECTED
+    submissions for no_autograder assignments (presence/count, never a score):
+    those repos publish no submit/* release, so this is their only signal.
 
     `roster_meta` is the best-effort roster join (username -> display metadata,
     see load_roster_metadata); when a collected owner has a matching row its
@@ -558,6 +894,10 @@ def collect_classroom(
     # Assignments this run actually walked (slug -> mode), for `collected_at`
     # stamping. Populated only past the team-read gate below.
     collected: dict[str, str] = {}
+    # Detected (ungraded) submissions per no_autograder assignment:
+    # slug -> (mode, records). Separate from `results` because these carry no
+    # score and must never enter the graded `entries` path.
+    detected: dict[str, tuple[str, list[dict[str, Any]], set[str]]] = {}
     # (assignment) buckets where every present submission was rejected by
     # validation (the mode-flip symptom). Returned so main() can suppress its
     # "rotate token" heuristic, which would otherwise misread this as a
@@ -577,10 +917,11 @@ def collect_classroom(
     team_slug = resolve_team_slug(classroom_meta, classroom_short)
     try:
         team_usernames, student_logins = list_enrolled_logins(
-            api_url, org, classroom_meta, classroom_short, service_token
+            api_url, org, classroom_meta, classroom_short, service_token,
+            team_members=team_members,
         )
     except urllib.error.HTTPError as exc:
-        if is_hard_http_error(exc):
+        if classify(exc) is not SKIPPABLE:
             raise
         emit_warning(
             f"{classroom_short}: could not read team {team_slug!r} members: "
@@ -589,20 +930,20 @@ def collect_classroom(
             f"Members: Read (a fine-grained PAT permission) — rotate it with "
             f"`gh teacher rotate-service-token {org}`."
         )
-        return results, mode_flip_assignments, collected
+        return results, mode_flip_assignments, collected, detected
     except (json.JSONDecodeError, ValueError) as exc:
         emit_warning(
             f"{classroom_short}: team {team_slug!r} member listing malformed "
             f"({exc}); skipping collection for this classroom."
         )
-        return results, mode_flip_assignments, collected
+        return results, mode_flip_assignments, collected, detected
 
     if not team_usernames:
         emit_warning(
             f"{classroom_short}: teams {team_slug!r} (and staff teams) have no "
             f"members — no (username, assignment) pairs to poll; skipping."
         )
-        return results, mode_flip_assignments, collected
+        return results, mode_flip_assignments, collected, detected
 
     # Group attribution credits a collaborator only if on a classroom team
     # (owner always credited) — same trust model, team-sourced set. Staff are in
@@ -615,12 +956,34 @@ def collect_classroom(
         if assignment_filter and slug != assignment_filter:
             continue
         # Assignments that never autograde (empty_repo or no_autograder) —
-        # same predicate as valid_assignment_slugs, kept in lockstep.
+        # same predicate as valid_assignment_slugs, kept in lockstep. There are
+        # no submit/* releases to ingest and no scores to record, but a
+        # submission still HAPPENED, so detect it from repo state instead
+        # (presence/count only, never a grade) — issue #659. An empty_repo
+        # assignment has no submission definition at all, so it stays skipped.
         if skips_grading(entry):
-            reason = "empty_repo" if is_empty_repo(entry) else "no_autograder"
+            if is_empty_repo(entry):
+                print(
+                    f"{classroom_short}/{slug}: empty_repo assignment — "
+                    f"autograding is disabled; skipping collection"
+                )
+                continue
+            detected_type, detected_records, detected_visited = collect_detected(
+                api_url=api_url,
+                org=org,
+                classroom_short=classroom_short,
+                slug=slug,
+                entry=entry,
+                team_usernames=team_usernames,
+                repo_index=repo_index,
+                service_token=service_token,
+            )
+            detected[slug] = (detected_type, detected_records, detected_visited)
+            collected[slug] = detected_type
             print(
-                f"{classroom_short}/{slug}: {reason} assignment — autograding "
-                f"is disabled; skipping collection"
+                f"{classroom_short}/{slug}: no_autograder assignment — "
+                f"autograding is disabled; detected "
+                f"{len(detected_records)} submitter(s) from repo state"
             )
             continue
 
@@ -648,6 +1011,15 @@ def collect_classroom(
         assignment_type = "group" if is_group else "individual"
         collected[slug] = assignment_type
 
+        # One-shot pre-rename slug (see validate_result): a non-string or empty
+        # value reads as absent, matching the additive-schema tolerance rule.
+        raw_renamed_from = entry.get("renamed_from")
+        renamed_from = (
+            raw_renamed_from
+            if isinstance(raw_renamed_from, str) and raw_renamed_from
+            else None
+        )
+
         submitted = 0
         # Staff (non-student-team) members who actually submitted this
         # assignment. They count toward the "X of Y" denominator only when they
@@ -659,11 +1031,16 @@ def collect_classroom(
         mode_flip_repos: list[str] = []
         for username in team_usernames:
             repo_name = assignment_repo_name(classroom_short, slug, username)
+            # A name the index doesn't know has no repo, so its release poll
+            # would 404 and read as "not submitted" anyway — same outcome, one
+            # request less.
+            if repo_index is not None and not repo_index.contains(repo_name):
+                continue
 
             try:
                 releases = all_submit_releases(api_url, org, repo_name, service_token)
             except urllib.error.HTTPError as exc:
-                if is_hard_http_error(exc):
+                if classify(exc) is not SKIPPABLE:
                     raise
                 emit_warning(
                     f"{org}/{repo_name}: release listing failed: HTTP {exc.code} "
@@ -691,7 +1068,7 @@ def collect_classroom(
                 try:
                     candidate = download_result_asset(api_url, release, service_token)
                 except urllib.error.HTTPError as exc:
-                    if is_hard_http_error(exc):
+                    if classify(exc) is not SKIPPABLE:
                         raise
                     emit_warning(
                         f"{org}/{repo_name}: result.json download failed for "
@@ -717,7 +1094,14 @@ def collect_classroom(
                 # a mode-flipped or mis-typed result is rejected here — no
                 # separate assignment_type cross-check needed afterward.
                 try:
-                    validate_result(candidate, classroom_short, slug, username, is_group=is_group)
+                    validate_result(
+                        candidate,
+                        classroom_short,
+                        slug,
+                        username,
+                        is_group=is_group,
+                        renamed_from=renamed_from,
+                    )
                 except ValueError as exc:
                     emit_warning(
                         f"{org}/{repo_name}: invalid result.json for "
@@ -764,9 +1148,20 @@ def collect_classroom(
             # right after `owner` in the written JSON key order.
             members: list[str] | None = None
             if is_group:
-                members, degraded_warning = attribute_group_members(
-                    api_url, org, repo_name, username, service_token, roster_logins
-                )
+                try:
+                    members, degraded_warning = attribute_group_members(
+                        api_url, org, repo_name, username, service_token, roster_logins
+                    )
+                except IncompleteListing as exc:
+                    # A partial list must not be written as if it were whole:
+                    # skipping the repo leaves its previous gradebook entry (and
+                    # its credited teammates) intact.
+                    emit_warning(
+                        f"{org}/{repo_name}: group collaborator listing is "
+                        f"incomplete ({exc}); skipping this repo so its existing "
+                        f"member credit is preserved. Re-run to collect it."
+                    )
+                    continue
                 if degraded_warning is not None:
                     group_attribution_degraded += 1
                     emit_warning(degraded_warning)
@@ -841,7 +1236,7 @@ def collect_classroom(
             f"lacks the collaborator-read permission — rotate it with `gh teacher rotate-service-token`."
         )
 
-    return results, mode_flip_assignments, collected
+    return results, mode_flip_assignments, collected, detected
 
 
 def assignment_repo_name(classroom: str, assignment: str, username: str) -> str:
@@ -887,10 +1282,7 @@ def get_repo(api_url: str, owner: str, repo: str, token: str) -> dict[str, Any] 
     """GET /repos/{owner}/{repo} → the repo object, or None on 404. Used to read
     a template's `private` flag before granting a staff team access to it. A hard
     error (401/403/599) propagates so main() aborts."""
-    url = (
-        f"{api_url}/repos/{urllib.parse.quote(owner, safe='')}/"
-        f"{urllib.parse.quote(repo, safe='')}"
-    )
+    url = _repo_url(api_url, owner, repo)
     try:
         body = _http_get(url, token, accept="application/vnd.github+json")
     except urllib.error.HTTPError as exc:
@@ -915,6 +1307,26 @@ def assignment_template_ref(entry: dict[str, Any]) -> tuple[str, str] | None:
     return None
 
 
+class GrantThrottled(Exception):
+    """The staff-team grant pass hit GitHub's rate limiter.
+
+    Distinct from an HTTPError so main() can tell throttling from refusal: it
+    carries how far the pass got, the run stays green, and nothing suggests
+    rotating a credential that is working. The pass is idempotent, so whatever
+    is deferred is granted by the next run."""
+
+    def __init__(self, reason: str, team_slug: str, granted: int, deferred: int) -> None:
+        super().__init__(
+            f"staff-team grant for {team_slug!r} was throttled by GitHub "
+            f"({reason}) after {granted} new grant(s); {deferred} target(s) "
+            f"deferred to the next run"
+        )
+        self.reason = reason
+        self.team_slug = team_slug
+        self.granted = granted
+        self.deferred = deferred
+
+
 def grant_classroom_team_access(
     *,
     api_url: str,
@@ -923,6 +1335,9 @@ def grant_classroom_team_access(
     classroom_meta: dict[str, Any],
     assignments: dict[str, Any],
     service_token: str,
+    repo_index: RepoIndex | None = None,
+    team_members: "TeamMembers | None" = None,
+    assignment_filter: str = "",
 ) -> None:
     """Grant each classroom staff team its mapped repo permission (see
     STAFF_TEAM_PERMISSIONS) on every EXISTING student assignment repo and on each
@@ -930,16 +1345,26 @@ def grant_classroom_team_access(
     collection re-affirms access cheaply.
 
     Student-repo targets are the (team member × assignment) product — the same
-    set collect_classroom polls. A per-repo 404/422 (repo not accepted yet, or
-    template not org-owned) is warned-and-skipped; a hard error (401/403/599)
-    propagates so main() aborts. A classroom with no mapped staff team is a no-op.
+    set collect_classroom polls — narrowed to the repos that exist when
+    `repo_index` can say (thousands of names per classroom, two wasted requests
+    each). A per-repo 404/422 (repo not accepted yet, or template not
+    org-owned) is warned-and-skipped; a hard error (401/403/599) propagates so
+    main() aborts; a throttle raises GrantThrottled, which main() reports as a
+    deferral rather than a failure. A classroom with no mapped staff team is a
+    no-op.
+
+    A staff team with no members is skipped per-slug (its grants would benefit
+    nobody), so an empty ta team still lets a populated hta team grant.
+
+    `assignment_filter` scopes the grant to one assignment (its student repos
+    and its private template); blank grants every assignment as before.
     """
     role_slugs = resolve_staff_team_slugs(classroom_meta)
-    grant_slugs = {
-        role: (slug, STAFF_TEAM_PERMISSIONS[role])
+    grant_slugs = [
+        (slug, STAFF_TEAM_PERMISSIONS[role])
         for role, slug in role_slugs.items()
         if role in STAFF_TEAM_PERMISSIONS
-    }
+    ]
     if not grant_slugs:
         return
 
@@ -947,14 +1372,25 @@ def grant_classroom_team_access(
     # skipped by collection but their student repos still exist and staff
     # still need access to review them.
     slugs = all_assignment_slugs(assignments)
+    if assignment_filter:
+        # Skip a classroom lacking the slug silently, like collect_classroom:
+        # main()'s run-level guard owns the single loud "no such slug" error,
+        # so warning here would spam once per non-matching classroom.
+        if assignment_filter not in slugs:
+            return
+        slugs = [assignment_filter]
     if not slugs:
         return
 
     student_team_slug = resolve_team_slug(classroom_meta, classroom_short)
     try:
-        team_logins = list_team_member_logins(api_url, org, student_team_slug, service_token)
+        team_logins = (
+            team_members.logins(student_team_slug)
+            if team_members is not None
+            else list_team_member_logins(api_url, org, student_team_slug, service_token)
+        )
     except urllib.error.HTTPError as exc:
-        if is_hard_http_error(exc):
+        if classify(exc) is not SKIPPABLE:
             raise
         emit_warning(
             f"{classroom_short}: could not read team {student_team_slug!r} members for "
@@ -970,65 +1406,171 @@ def grant_classroom_team_access(
 
     usernames = _dedupe_logins(team_logins)
 
-    # Grant on each existing student repo (the team × assignment product).
-    for role, (team_slug, permission) in grant_slugs.items():
-        granted = 0
-        for slug in slugs:
-            for username in usernames:
-                repo_name = assignment_repo_name(classroom_short, slug, username)
-                try:
-                    if grant_team_repo(
-                        api_url, org, team_slug, org, repo_name, permission, service_token
-                    ):
-                        granted += 1
-                except urllib.error.HTTPError as exc:
-                    if is_hard_http_error(exc):
-                        raise
-                    # 404 = repo not accepted yet; 422 = not org-owned. Neither is
-                    # a token problem — skip that repo.
-                    emit_warning(
-                        f"{org}/{repo_name}: could not grant {team_slug!r} {permission}: "
-                        f"HTTP {exc.code} ({exc.reason or 'no reason'}); skipping"
-                    )
+    # Resolved once rather than per staff role. Knowing the full list up front is
+    # also what lets a throttled pass say how much is left for the next run.
+    targets: list[tuple[str, str]] = []
+    for slug in slugs:
+        for username in usernames:
+            repo_name = assignment_repo_name(classroom_short, slug, username)
+            if repo_index is not None and not repo_index.contains(repo_name):
+                continue
+            targets.append((org, repo_name))
+    targets.extend(
+        private_template_targets(
+            api_url, org, assignments, service_token, repo_index=repo_index,
+            assignment_filter=assignment_filter,
+        )
+    )
+    if not targets:
+        return
 
-        # Grant on each private, in-org template (starter code the staff team
-        # should also be able to read). Public and out-of-org templates are
-        # skipped: a public template needs no grant, and an out-of-org private
-        # template can't be granted to this org's team.
-        for entry in assignments.get("assignments") or []:
-            ref = assignment_template_ref(entry) if isinstance(entry, dict) else None
-            if ref is None:
-                continue
-            t_owner, t_repo = ref
-            if t_owner.lower() != org.lower():
-                continue
-            try:
-                repo = get_repo(api_url, t_owner, t_repo, service_token)
-            except urllib.error.HTTPError as exc:
-                if is_hard_http_error(exc):
-                    raise
-                emit_warning(
-                    f"{t_owner}/{t_repo}: could not read template for {team_slug!r} grant: "
-                    f"HTTP {exc.code} ({exc.reason or 'no reason'}); skipping"
-                )
-                continue
-            if repo is None or not repo.get("private"):
-                continue
+    for team_slug, permission in grant_slugs:
+        # Read this staff team's members to skip it when empty (see docstring).
+        # Same SKIPPABLE-warn-and-skip contract as the student read above: any
+        # non-401/403/599/throttle (404 = team not created yet, 422, …) skips
+        # this team for the run; the add-only pass re-affirms it next run.
+        try:
+            staff_logins = (
+                team_members.logins(team_slug)
+                if team_members is not None
+                else list_team_member_logins(api_url, org, team_slug, service_token)
+            )
+        except urllib.error.HTTPError as exc:
+            if classify(exc) is not SKIPPABLE:
+                raise
+            emit_warning(
+                f"{classroom_short}: could not read staff team {team_slug!r} members: "
+                f"HTTP {exc.code} ({exc.reason or 'no reason'}); skipping its grant this run."
+            )
+            continue
+        except (json.JSONDecodeError, ValueError) as exc:
+            emit_warning(
+                f"{classroom_short}: staff team {team_slug!r} member listing malformed "
+                f"({exc}); skipping its grant this run."
+            )
+            continue
+        if not staff_logins:
+            continue
+
+        # One bulk read replaces grant_team_repo's per-repo access check: after
+        # the first run nearly every target is already granted, so that check —
+        # not the PUT — is the request that dominates. None means "unknown".
+        known_repos = known_team_repos(
+            api_url, org, team_slug, service_token, classroom_short
+        )
+        granted = 0
+        for index, (t_owner, t_repo) in enumerate(targets):
             try:
                 if grant_team_repo(
-                    api_url, org, team_slug, t_owner, t_repo, permission, service_token
+                    api_url,
+                    org,
+                    team_slug,
+                    t_owner,
+                    t_repo,
+                    permission,
+                    service_token,
+                    known_repos=known_repos,
                 ):
                     granted += 1
             except urllib.error.HTTPError as exc:
-                if is_hard_http_error(exc):
+                # One ladder walk: the tuple already carries the reason
+                # GrantThrottled needs, typed as str.
+                throttle = rate_limit_verdict(exc)
+                if throttle is not None:
+                    raise GrantThrottled(
+                        throttle[0], team_slug, granted, len(targets) - index
+                    ) from exc
+                if classify(exc) is FATAL:
                     raise
+                # 404 = repo not accepted yet; 422 = not org-owned. Neither is
+                # a token problem — skip that repo.
                 emit_warning(
                     f"{t_owner}/{t_repo}: could not grant {team_slug!r} {permission}: "
-                    f"HTTP {exc.code} ({exc.reason or 'no reason'}); skipping"
+                    f"HTTP {exc.code} ({exc.reason or 'no reason'}){body_note(exc)}; skipping"
                 )
 
         if granted:
             print(f"{classroom_short}: granted {team_slug} {permission} on {granted} repo(s)")
+
+
+def private_template_targets(
+    api_url: str,
+    org: str,
+    assignments: dict[str, Any],
+    service_token: str,
+    repo_index: RepoIndex | None = None,
+    assignment_filter: str = "",
+) -> list[tuple[str, str]]:
+    """The private, in-org assignment templates (starter code the staff team
+    should also be able to read), as (owner, repo) pairs.
+
+    Public templates need no grant and an out-of-org private template can't be
+    granted to this org's team, so both are skipped; a template that can't be
+    read is warned about and dropped, while a hard error propagates. Resolved
+    once for all staff roles — the read doesn't depend on the team.
+
+    `repo_index` already knows each in-org repo's `private` flag from the org
+    listing, so the per-template read only happens when it can't say.
+
+    `assignment_filter` scopes to one assignment's template; blank keeps all."""
+    targets: list[tuple[str, str]] = []
+    # Deduped on the REF, not the kept targets: assignments commonly share one
+    # starter template, and only private ones are kept — so deduping on the
+    # output would re-read every public template once per assignment.
+    seen: set[tuple[str, str]] = set()
+    for entry in assignments.get("assignments") or []:
+        if not isinstance(entry, dict):
+            continue
+        if assignment_filter and entry.get("slug") != assignment_filter:
+            continue
+        ref = assignment_template_ref(entry)
+        if ref is None:
+            continue
+        t_owner, t_repo = ref
+        if t_owner.lower() != org.lower() or ref in seen:
+            continue
+        seen.add(ref)
+        private = repo_index.is_private(t_repo) if repo_index is not None else None
+        if private is None:
+            try:
+                repo = get_repo(api_url, t_owner, t_repo, service_token)
+            except urllib.error.HTTPError as exc:
+                if classify(exc) is not SKIPPABLE:
+                    raise
+                emit_warning(
+                    f"{t_owner}/{t_repo}: could not read template for the staff-team "
+                    f"grant: HTTP {exc.code} ({exc.reason or 'no reason'}); skipping"
+                )
+                continue
+            private = repo is not None and repo.get("private") is True
+        if not private:
+            continue
+        targets.append((t_owner, t_repo))
+    return targets
+
+
+def known_team_repos(
+    api_url: str, org: str, team_slug: str, token: str, classroom_short: str
+) -> set[str] | None:
+    """Lowercased `owner/repo` of every repo `team_slug` already has access to,
+    or None when the listing failed. None means "unknown", which makes callers
+    fall back to the per-repo access check — never to "not granted", which
+    would re-PUT every repo on every run."""
+    try:
+        return list_team_repo_full_names(api_url, org, team_slug, token)
+    except urllib.error.HTTPError as exc:
+        if classify(exc) is not SKIPPABLE:
+            raise
+        emit_warning(
+            f"{classroom_short}: could not list team {team_slug!r} repos: HTTP "
+            f"{exc.code} ({exc.reason or 'no reason'}); checking access per repo."
+        )
+    except (json.JSONDecodeError, ValueError) as exc:
+        emit_warning(
+            f"{classroom_short}: team {team_slug!r} repo listing malformed "
+            f"({exc}); checking access per repo."
+        )
+    return None
 
 
 def _dedupe_logins(logins: list[str]) -> list[str]:
@@ -1377,6 +1919,7 @@ def validate_result(
     expected_username: str,
     *,
     is_group: bool = False,
+    renamed_from: str | None = None,
 ) -> None:
     """Raise ValueError if the payload fails the v1 contract. The
     classroom/assignment/owner checks defend against a hostile result.json
@@ -1388,6 +1931,11 @@ def validate_result(
     "individual"/"group" and match the mode implied by `is_group`. No
     `usernames` field: who pushed is `submitted_by`; the credited member list
     is resolved by collection after this check.
+
+    `renamed_from` is the manifest entry's pre-rename slug (one-shot, so a
+    single value): a historical release published before the rename carries it
+    in the immutable result.json, and is accepted so old grades survive the
+    rename. Exactly that value — never an arbitrary third slug.
     """
     if not isinstance(payload, dict):
         raise ValueError(f"top-level value must be an object, got {type(payload).__name__}")
@@ -1399,8 +1947,13 @@ def validate_result(
         raise ValueError(f"classroom = {classroom!r}, want {expected_classroom!r}")
 
     assignment = payload.get("assignment")
-    if assignment != expected_assignment:
-        raise ValueError(f"assignment = {assignment!r}, want {expected_assignment!r}")
+    if assignment != expected_assignment and (
+        renamed_from is None or assignment != renamed_from
+    ):
+        want = repr(expected_assignment)
+        if renamed_from is not None:
+            want += f" (or pre-rename {renamed_from!r})"
+        raise ValueError(f"assignment = {assignment!r}, want {want}")
 
     owner = payload.get("owner")
     if not isinstance(owner, str) or not owner:
@@ -1497,6 +2050,334 @@ def _repo_url(api_url: str, owner: str, repo: str) -> str:
     )
 
 
+# --- Detected submissions (assignments that skip grading) -------------------
+#
+# An assignment with autograding disabled publishes no submit/* release, so the
+# graded path above has nothing to ingest. These helpers derive submissions from
+# repo state instead — presence and count only, never a score — mirroring the
+# web app's src/domain/assignments/submissionDetection.ts. Keep the two in step:
+# a divergence makes the assignments list and the submissions page disagree.
+
+# The commit subjects the tool itself authors onto a student's default branch
+# (accept's Feedback-PR commit and the submission-mode shim retrofit). Neither is
+# student work, so neither counts as a submission. Hand-mirrored with
+# cli/shared/contract's PrefixCommit forms and the web's TOOL_COMMIT_SUBJECTS.
+TOOL_COMMIT_SUBJECTS = frozenset(
+    {
+        "[Classroom 50] Open Feedback PR (gh student accept)",
+        "[Classroom 50] Update autograder trigger to every-push (submission-mode)",
+        "[Classroom 50] Update autograder trigger to tag (submission-mode)",
+    }
+)
+
+# The in-repo accept marker; its OLDEST commit is the baseline that separates
+# accept-time setup (including the template's own commits, which are its
+# ancestors) from student work. Mirrors contract.MetadataPath.
+ACCEPT_MARKER_PATH = ".classroom50.yaml"
+
+# The canonical submission-tag namespace the shim always triggers on, unioned
+# with any milestone patterns (see SUBMIT_TAG_PREFIX at the top of the file).
+
+_SUBMIT_TAG_TIME_RE = re.compile(
+    r"^submit/(\d{4}-\d{2}-\d{2})T([01]\d|2[0-3])-([0-5]\d)-([0-5]\d)Z-"
+)
+
+
+def commit_subject(message: Any) -> str:
+    """A commit message's first line, trimmed."""
+    if not isinstance(message, str):
+        return ""
+    return message.split("\n", 1)[0].strip()
+
+
+def submit_tag_datetime(tag_name: str) -> str | None:
+    """The instant encoded in a canonical `submit/<UTC-ts>-<short-sha>` tag name
+    (buildSubmitTag replaces the timestamp's colons with dashes to keep the ref
+    valid). None for a milestone or malformed name — the caller then has no free
+    time source and leaves the record dateless."""
+    match = _SUBMIT_TAG_TIME_RE.match(tag_name or "")
+    if not match:
+        return None
+    day, hour, minute, second = match.groups()
+    return f"{day}T{hour}:{minute}:{second}Z"
+
+
+# Compiled-pattern cache for _compile_tag_pattern: detect_tag_submissions
+# re-evaluates each pattern against every tag, and compilation is the pricey
+# half. Output-neutral, so the regrade/web matcher parity is untouched.
+_COMPILED_TAG_PATTERNS: dict[str, "re.Pattern[str] | None"] = {}
+
+
+def _compile_tag_pattern(pattern: str) -> "re.Pattern[str] | None":
+    """One Actions tag-filter pattern -> an anchored regex, or None when it
+    can't compile (fail closed: matches nothing). Character by character so
+    `.` and other regex metacharacters in the pattern stay literal. Supported
+    subset: literal names, `*` (not crossing `/`), `**` (crossing), `?`/`+`
+    (zero-or-one / one-or-more of the preceding element), `[abc]` classes.
+    """
+    if pattern in _COMPILED_TAG_PATTERNS:
+        return _COMPILED_TAG_PATTERNS[pattern]
+    out = ["^"]
+    i = 0
+    while i < len(pattern):
+        ch = pattern[i]
+        if ch == "*":
+            if i + 1 < len(pattern) and pattern[i + 1] == "*":
+                out.append(".*")  # ** crosses /
+                i += 1
+            else:
+                out.append("[^/]*")  # * stops at /
+        elif ch in ("?", "+"):
+            out.append(ch)
+        elif ch == "[":
+            close = pattern.find("]", i + 1)
+            if close != -1:
+                out.append(pattern[i : close + 1])  # class verbatim
+                i = close
+            else:
+                out.append(re.escape(ch))  # unclosed [ is literal
+        else:
+            out.append(re.escape(ch))
+        i += 1
+    out.append("$")
+    try:
+        compiled = re.compile("".join(out))
+    except re.error:
+        compiled = None
+    _COMPILED_TAG_PATTERNS[pattern] = compiled
+    return compiled
+
+
+# The safe-pattern charset — literal-name characters plus the glob
+# metacharacters GitHub Actions tag filters support. Keep in lockstep with Go
+# contract.SubmissionTagCharsetRE and the web SUBMISSION_TAG_PATTERN_RE.
+_TAG_PATTERN = re.compile(r"^[A-Za-z0-9._/*?+\[\]-]+$")
+
+# A leading `?`/`+` (nothing to repeat) or a `+` stacked on another quantifier
+# (`v*+`, `a++`). LOAD-BEARING in a Python mirror: those translate to POSSESSIVE
+# quantifiers, which Python 3.11+ compiles (and matches!) while Go RE2 and JS
+# reject — without this guard the matcher copies diverge on exactly these
+# patterns. Keep in lockstep with Go contract.stackedQuantifierRE and the web.
+_STACKED_QUANTIFIER = re.compile(r"^[?+]|[*?+]\+")
+
+
+def matches_submission_tag(patterns: Iterable[str], tag_name: str) -> bool:
+    """Whether `tag_name` matches ANY of the Actions tag-filter `patterns`; an
+    empty list matches nothing. By-value copy of Go's
+    contract.MatchesSubmissionTag, the web matchesSubmissionTag, and
+    regrade_repos.py's copy — all pinned to identical output by the shared
+    golden fixture cli/shared/testdata/submission_tag_match_cases.json. The same
+    strings are rendered into the shim's on.push.tags, so this matcher and
+    GitHub's own filter evaluation must agree on what fires. Keep in lockstep."""
+    for pattern in patterns:
+        if not isinstance(pattern, str) or not pattern:
+            continue
+        if not _TAG_PATTERN.fullmatch(pattern) or _STACKED_QUANTIFIER.search(pattern):
+            continue  # fail closed, matching the Go/JS charset+compile guards
+        compiled = _compile_tag_pattern(pattern)
+        if compiled is not None and compiled.fullmatch(tag_name or "") is not None:
+            return True
+    return False
+
+
+def detect_branch_submissions(
+    commits: list[dict[str, Any]], baseline_sha: str | None
+) -> list[dict[str, Any]]:
+    """Branch mode: every default-branch commit past the accept baseline that the
+    tool didn't author is one submission. `commits` is newest-first (GitHub's
+    order), so the baseline's index is the cut point — everything at or before it
+    is accept-time setup, including the template's ancestor commits."""
+    cut = len(commits)
+    if baseline_sha:
+        for index, commit in enumerate(commits):
+            if commit.get("sha") == baseline_sha:
+                cut = index
+                break
+    detected: list[dict[str, Any]] = []
+    for commit in commits[:cut]:
+        payload = commit.get("commit") if isinstance(commit.get("commit"), dict) else {}
+        if commit_subject(payload.get("message")) in TOOL_COMMIT_SUBJECTS:
+            continue
+        committer = payload.get("committer") if isinstance(payload.get("committer"), dict) else {}
+        author = payload.get("author") if isinstance(payload.get("author"), dict) else {}
+        detected.append(
+            {
+                "sha": commit.get("sha"),
+                "datetime": committer.get("date") or author.get("date"),
+            }
+        )
+    return detected
+
+
+def detect_tag_submissions(
+    tags: list[dict[str, Any]], submission_tags: list[str]
+) -> list[dict[str, Any]]:
+    """Tag mode: an EXACT pattern yields one submission per matching tag; a GLOB
+    groups all its matches into one submission set. A tag claimed by an earlier
+    pattern is never double-counted. Mirrors detectTagSubmissions."""
+    detected: list[dict[str, Any]] = []
+    claimed: set[str] = set()
+    for pattern in submission_tags:
+        matches = [
+            tag
+            for tag in tags
+            if isinstance(tag.get("name"), str)
+            and tag["name"] not in claimed
+            and matches_submission_tag([pattern], tag["name"])
+        ]
+        if not matches:
+            continue
+        for tag in matches:
+            claimed.add(tag["name"])
+        if any(ch in pattern for ch in "*?+[]"):
+            # A group's time comes from its newest member by encoded submit/*
+            # timestamp; a milestone glob has no parseable name, so it stays
+            # dateless rather than guessing. (Encoded times share one fixed
+            # `YYYY-MM-DDTHH:MM:SSZ` shape, so max() on the strings is
+            # chronological.)
+            dated = [
+                encoded
+                for tag in matches
+                if (encoded := submit_tag_datetime(tag["name"])) is not None
+            ]
+            detected.append(
+                {"count": len(matches), "datetime": max(dated) if dated else None}
+            )
+        else:
+            for tag in matches:
+                detected.append(
+                    {"count": 1, "datetime": submit_tag_datetime(tag["name"])}
+                )
+    return detected
+
+
+def list_default_branch_commits(
+    api_url: str, owner: str, repo: str, branch: str, token: str,
+    stop_at_sha: str | None = None,
+) -> list[dict[str, Any]]:
+    """A repo's default-branch commits, newest first. With `stop_at_sha` (the
+    accept baseline) the walk ends on the page that contains it — everything at
+    or past the baseline is accept-time setup the caller cuts anyway, so paging
+    through the rest of a long history would be pure waste."""
+    return _paginate_objects(
+        lambda page: (
+            f"{_repo_url(api_url, owner, repo)}/commits"
+            f"?sha={urllib.parse.quote(branch, safe='')}&per_page=100&page={page}"
+        ),
+        api_url,
+        token,
+        f"{owner}/{repo} commits",
+        stop_after=(
+            (lambda commit: commit.get("sha") == stop_at_sha)
+            if stop_at_sha
+            else None
+        ),
+    )
+
+
+def oldest_commit_sha_for_path(
+    api_url: str, owner: str, repo: str, path: str, token: str
+) -> str | None:
+    """The oldest commit touching a path — the accept-marker baseline. None when
+    the path has no history (a bare repo), which trims nothing."""
+    commits = _paginate_objects(
+        lambda page: (
+            f"{_repo_url(api_url, owner, repo)}/commits"
+            f"?path={urllib.parse.quote(path, safe='')}&per_page=100&page={page}"
+        ),
+        api_url,
+        token,
+        f"{owner}/{repo} marker history",
+    )
+    if not commits:
+        return None
+    sha = commits[-1].get("sha")
+    return sha if isinstance(sha, str) and sha else None
+
+
+def list_repo_tags(
+    api_url: str, owner: str, repo: str, token: str
+) -> list[dict[str, Any]]:
+    """Every tag on a repo (lightweight refs; carries no dates)."""
+    return _paginate_objects(
+        lambda page: (
+            f"{_repo_url(api_url, owner, repo)}/tags?per_page=100&page={page}"
+        ),
+        api_url,
+        token,
+        f"{owner}/{repo} tags",
+    )
+
+
+def detect_repo_submissions(
+    api_url: str,
+    org: str,
+    repo_name: str,
+    token: str,
+    mode: str,
+    submission_tags: list[str],
+) -> list[dict[str, Any]]:
+    """One repo's detected submissions. Branch mode reads the default branch, its
+    accept-marker baseline and its commit log; tag mode reads its tags. Returns
+    [] for a repo that isn't accepted or is commitless."""
+    if mode == "tag":
+        tags = list_repo_tags(api_url, org, repo_name, token)
+        patterns = [*submission_tags, f"{SUBMIT_TAG_PREFIX}*"]
+        return detect_tag_submissions(tags, patterns)
+
+    info = get_repo(api_url, org, repo_name, token)
+    branch = (info or {}).get("default_branch")
+    if not isinstance(branch, str) or not branch:
+        return []  # not accepted, or no commits yet
+    baseline = oldest_commit_sha_for_path(
+        api_url, org, repo_name, ACCEPT_MARKER_PATH, token
+    )
+    commits = list_default_branch_commits(
+        api_url, org, repo_name, branch, token, stop_at_sha=baseline
+    )
+    return detect_branch_submissions(commits, baseline)
+
+
+def detected_record(
+    owner: str,
+    detections: list[dict[str, Any]],
+    due: datetime.datetime | None,
+    trust_times: bool = True,
+) -> dict[str, Any]:
+    """Fold one repo's detections into the scores/v1 `detected` record: a count,
+    the newest instant, and the late flag derived from it. Carries no score —
+    these assignments are never graded.
+
+    `trust_times` is False in TAG mode, where the only available instant is
+    decoded from the `submit/<ts>` tag NAME. That name is student-authored, so a
+    student could backdate it to dodge a late flag or forge a "last submitted"
+    time. The web side refuses tag times for lateness for exactly this reason
+    (see latestCommitDetectedAt), so neither `latest_datetime` nor `late` is
+    recorded from one — the count still is, since tag EXISTENCE isn't forgeable.
+    """
+    count = sum(int(d.get("count", 1) or 1) for d in detections)
+    record: dict[str, Any] = {"owner": owner, "count": count}
+    if not trust_times:
+        return record
+    # Latest by PARSED time, not lexicographic max: a commit date carrying a
+    # non-Z offset would missort as a string, and an unparseable string must
+    # not shadow a parseable older one — mirrors the web's latestDetectedAt.
+    times = [
+        parsed
+        for d in detections
+        if isinstance(d.get("datetime"), str)
+        and (parsed := parse_rfc3339(d["datetime"])) is not None
+    ]
+    if times:
+        latest = max(times)
+        record["latest_datetime"] = latest.astimezone(
+            datetime.timezone.utc
+        ).strftime("%Y-%m-%dT%H:%M:%SZ")
+        if due is not None:
+            record["late"] = latest > due
+    return record
+
+
 def all_submit_releases(
     api_url: str, owner: str, repo: str, token: str
 ) -> list[dict[str, Any]]:
@@ -1506,56 +2387,39 @@ def all_submit_releases(
     hand-created tag) are filtered out. A 404 (no releases, or repo not
     accepted) yields an empty list.
 
-    Pagination follows GitHub's `Link: rel="next"` header (host-pinned to
-    api_url so the token can't be pivoted off-host), falling back to the
-    short-page heuristic when no Link header is present — mirrors
-    list_repo_collaborator_logins.
+    Pagination is _paginate_objects', so an incompletable walk (looping Link
+    chain or the page cap) raises IncompleteListing rather than returning a
+    truncated history — a partial list would replace the student's prior entry
+    with fewer submissions, and the caller's warn-and-skip preserves it instead.
     """
-    per_page = 100
-    max_pages = 100
-    releases: list[dict[str, Any]] = []
-    url = f"{_repo_url(api_url, owner, repo)}/releases?per_page={per_page}&page=1"
-    seen_next: set[str] = set()
-    for page in range(1, max_pages + 1):
-        try:
-            body, headers = _http_get_with_headers(
-                url, token, accept="application/vnd.github+json"
-            )
-        except urllib.error.HTTPError as exc:
-            if exc.code == 404:
-                return []
-            raise
-        batch = json.loads(body.decode("utf-8"))
-        if not isinstance(batch, list):
-            raise ValueError(f"GET {url}: expected JSON array, got {type(batch).__name__}")
-        for i, release in enumerate(batch):
-            if not isinstance(release, dict):
-                raise ValueError(
-                    f"GET {url}: expected release object at index {i}, got {type(release).__name__}"
-                )
-            if (release.get("tag_name") or "").startswith(SUBMIT_TAG_PREFIX):
-                # A read-write token also lists draft releases. The runner
-                # never publishes drafts, so a draft submit/* tag is hand-made
-                # noise whose assets aren't downloadable anyway — skip it.
-                if release.get("draft") is True:
-                    continue
-                releases.append(release)
-        link_header = headers.get("Link") if headers else None
-        next_url = _next_page_link(link_header)
-        if next_url:
-            next_url = _assert_same_host(next_url, api_url)
-            if next_url in seen_next:
-                return releases
-            seen_next.add(next_url)
-            url = next_url
-            continue
-        if link_header or len(batch) < per_page:
-            return releases
-        url = f"{_repo_url(api_url, owner, repo)}/releases?per_page={per_page}&page={page + 1}"
-    raise ValueError(
-        f"repos/{owner}/{repo}/releases: too many releases to enumerate "
-        f"(hit the {max_pages}-page cap)"
-    )
+    base = f"{_repo_url(api_url, owner, repo)}/releases"
+    try:
+        releases = _paginate_objects(
+            lambda page: f"{base}?per_page=100&page={page}",
+            api_url,
+            token,
+            f"repos/{owner}/{repo}/releases",
+        )
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return []
+        raise
+    return [
+        release
+        for release in releases
+        if (release.get("tag_name") or "").startswith(SUBMIT_TAG_PREFIX)
+        # A read-write token also lists draft releases. The runner never
+        # publishes drafts, so a draft submit/* tag is hand-made noise whose
+        # assets aren't downloadable anyway — skip it.
+        and release.get("draft") is not True
+    ]
+
+
+class IncompleteListing(ValueError):
+    """A paginated walk that could not be completed — a looping `Link` chain or
+    the page cap. Distinct from a malformed body so callers can tell a partial
+    list from a non-list: a partial list must never be persisted as the whole
+    set."""
 
 
 def _next_page_link(link_header: str | None) -> str | None:
@@ -1589,31 +2453,34 @@ def _assert_same_host(next_url: str, api_url: str) -> str:
     return next_url
 
 
-def _paginate_login_list(
+def _paginate_objects(
     page_url: Callable[[int], str],
     api_url: str,
     token: str,
     resource_label: str,
-) -> list[str]:
-    """Walk a paginated GitHub list-of-accounts endpoint, returning every
-    `login`. Shared core for list_repo_collaborator_logins and
-    list_team_member_logins — the only per-caller differences are the URL
-    builder and the cap-error label.
+    stop_after: Callable[[dict[str, Any]], bool] | None = None,
+) -> list[dict[str, Any]]:
+    """Walk a paginated GitHub list endpoint, returning every object it yields.
 
     `page_url(page)` builds the request URL for a 1-based page (caller owns
     per_page/page formatting). Only the first page uses it; subsequent pages
     follow GitHub's `Link: rel="next"`, host-pinned via _assert_same_host so a
     crafted Link can't pivot the token. When no Link header is present, falls
-    back to page+1 and stops on a short page (len < per_page). A self/looping
-    rel="next" is bounded by seen_next.
+    back to page+1 and stops on a short page (len < per_page).
+
+    `stop_after` (optional) ends the walk once any object on the current page
+    satisfies it — for callers that only need the prefix up to a sentinel (the
+    accept-baseline commit), sparing the rest of a long history. The whole page
+    is still returned, so the caller cuts precisely.
 
     Raises urllib.error.HTTPError on any non-2xx (including 404) so the caller
     can choose soft fallback vs. hard failure; raises ValueError on a non-array
-    body or on hitting the page cap.
+    body, and IncompleteListing (a ValueError) when the walk can't be completed
+    — a self/looping rel="next" or the page cap.
     """
     per_page = 100
     max_pages = 100
-    logins: list[str] = []
+    items: list[dict[str, Any]] = []
     url = page_url(1)
     seen_next: set[str] = set()
     for page in range(1, max_pages + 1):
@@ -1625,31 +2492,49 @@ def _paginate_login_list(
             raise ValueError(
                 f"GET {url}: expected JSON array, got {type(batch).__name__}"
             )
-        for item in batch:
-            if not isinstance(item, dict):
-                continue
-            login = item.get("login")
-            if isinstance(login, str) and login:
-                logins.append(login)
+        page_items = [item for item in batch if isinstance(item, dict)]
+        items.extend(page_items)
+        if stop_after is not None and any(stop_after(item) for item in page_items):
+            return items
         link_header = headers.get("Link") if headers else None
         next_url = _next_page_link(link_header)
         if next_url:
             next_url = _assert_same_host(next_url, api_url)
-            # Stop if the server points back at an already-fetched page
-            # (self/looping rel="next"): bounds a crafted or buggy Link chain
-            # to the pages actually seen instead of running out the cap.
+            # A truncated listing would be indistinguishable from a complete
+            # one. Raise instead; callers turn it into "unknown", failing open.
             if next_url in seen_next:
-                return logins
+                raise IncompleteListing(
+                    f"{resource_label}: pagination Link loops back to a page "
+                    f"already fetched ({next_url}); the listing is incomplete"
+                )
             seen_next.add(next_url)
             url = next_url
             continue
         if link_header or len(batch) < per_page:
-            return logins
+            return items
         url = page_url(page + 1)
-    raise ValueError(
+    raise IncompleteListing(
         f"{resource_label}: too many entries to enumerate "
         f"(hit the {max_pages}-page cap)"
     )
+
+
+def _paginate_field_list(
+    page_url: Callable[[int], str],
+    api_url: str,
+    token: str,
+    resource_label: str,
+    field: str = "login",
+) -> list[str]:
+    """Every object's `field` from a paginated endpoint (accounts by `login`,
+    repos by `name`/`full_name`). The one-field view of _paginate_objects, which
+    owns the walk and its error contract."""
+    values: list[str] = []
+    for item in _paginate_objects(page_url, api_url, token, resource_label):
+        value = item.get(field)
+        if isinstance(value, str) and value:
+            values.append(value)
+    return values
 
 
 def list_repo_collaborator_logins(
@@ -1676,7 +2561,7 @@ def list_repo_collaborator_logins(
     """
     per_page = 100
     base = f"{_repo_url(api_url, owner, repo)}/collaborators"
-    return _paginate_login_list(
+    return _paginate_field_list(
         page_url=lambda page: f"{base}?per_page={per_page}&page={page}",
         api_url=api_url,
         token=token,
@@ -1701,12 +2586,62 @@ def list_team_member_logins(
         f"{api_url}/orgs/{urllib.parse.quote(org, safe='')}/teams/"
         f"{urllib.parse.quote(team_slug, safe='')}/members"
     )
-    return _paginate_login_list(
+    return _paginate_field_list(
         page_url=lambda page: f"{base}?per_page={per_page}&page={page}",
         api_url=api_url,
         token=token,
         resource_label=f"orgs/{org}/teams/{team_slug}/members",
     )
+
+
+def list_org_repos(api_url: str, org: str, token: str) -> dict[str, bool]:
+    """Lowercased name -> `private` flag for every repo in `org` the token can
+    see, walking pagination. Hits GET /orgs/{org}/repos.
+
+    Read once per run — see RepoIndex, which documents why a name absent here
+    can be skipped. The `private` flag rides along from the same response
+    bodies, so the staff-team grant doesn't re-read each template to learn it.
+
+    Raises urllib.error.HTTPError on any non-2xx so the caller can fall back to
+    per-repo probing."""
+    per_page = 100
+    base = f"{api_url}/orgs/{urllib.parse.quote(org, safe='')}/repos"
+    repos = _paginate_objects(
+        page_url=lambda page: f"{base}?per_page={per_page}&page={page}&type=all",
+        api_url=api_url,
+        token=token,
+        resource_label=f"orgs/{org}/repos",
+    )
+    visible: dict[str, bool] = {}
+    for repo in repos:
+        name = repo.get("name")
+        if isinstance(name, str) and name:
+            visible[name.lower()] = repo.get("private") is True
+    return visible
+
+
+def list_team_repo_full_names(
+    api_url: str, org: str, team_slug: str, token: str
+) -> set[str]:
+    """Lowercased `owner/repo` of every repo `team_slug` has access to, walking
+    pagination. Hits GET /orgs/{org}/teams/{slug}/repos — the bulk form of
+    team_has_repo_access, read once instead of once per candidate repo.
+
+    Raises urllib.error.HTTPError on any non-2xx (including 404 when the team
+    doesn't exist) so the caller can warn-and-skip vs. hard-fail."""
+    per_page = 100
+    base = (
+        f"{api_url}/orgs/{urllib.parse.quote(org, safe='')}/teams/"
+        f"{urllib.parse.quote(team_slug, safe='')}/repos"
+    )
+    full_names = _paginate_field_list(
+        page_url=lambda page: f"{base}?per_page={per_page}&page={page}",
+        api_url=api_url,
+        token=token,
+        resource_label=f"orgs/{org}/teams/{team_slug}/repos",
+        field="full_name",
+    )
+    return {name.lower() for name in full_names}
 
 
 def group_member_usernames(
@@ -1766,16 +2701,31 @@ def attribute_group_members(
     collaborator-read failure `usernames` is forced to [owner] — never the
     runner/student-supplied list — and `warning` is a message the caller should
     emit and count as a degraded attribution.
+
+    Two failures are NOT degraded but propagated, because degrading here
+    PERSISTS an owner-only member list into scores.json — silently uncrediting
+    real teammates and then blaming the token in the aggregate warning:
+
+      * a THROTTLE (a rate-limit burst mid-run), and
+      * an INCOMPLETE listing (looping Link / page cap), where the collaborator
+        set we hold is partial and indistinguishable from a complete one.
+
+    A malformed body still degrades: there is no usable list to be partial
+    about, and the owner is the only defensible credit.
     """
     try:
         return group_member_usernames(api_url, org, repo, owner_username, token, roster_logins), None
     except urllib.error.HTTPError as exc:
+        if classify(exc) is THROTTLED:
+            raise
         return [owner_username], (
             f"{org}/{repo}: could not read group collaborators "
             f"(HTTP {exc.code} {exc.reason or 'no reason'}); crediting the "
             f"repo owner {owner_username!r} only. Ensure CLASSROOM50_SERVICE_TOKEN "
             f"can read repository collaborators (see the service-token wiki)."
         )
+    except IncompleteListing:
+        raise
     except (json.JSONDecodeError, ValueError) as exc:
         return [owner_username], (
             f"{org}/{repo}: group collaborator listing malformed "
@@ -1868,55 +2818,14 @@ def _http_get(
 def _http_get_with_headers(
     url: str, token: str, *, accept: str, max_bytes: int | None = None, _retries: int = 3
 ) -> tuple[bytes, Any]:
-    """GET `url` with bearer auth; return (body, response headers). Retries
-    5xx/429 with exponential backoff. The custom redirect handler strips
-    Authorization before following GitHub's asset-download redirect to S3
-    (otherwise the signed URL rejects the forwarded token).
-
-    Headers are returned so paginated callers can follow GitHub's `Link:
-    rel="next"` rather than guessing the next page from page length.
-    """
-    for attempt in range(_retries):
-        req = urllib.request.Request(
-            url,
-            method="GET",
-            headers={
-                "Accept": accept,
-                "Authorization": f"Bearer {token}",
-                "User-Agent": "classroom50-collect-scores",
-                "X-GitHub-Api-Version": "2022-11-28",
-            },
-        )
-        try:
-            with _OPENER.open(req, timeout=30) as resp:
-                body = resp.read(max_bytes) if max_bytes is not None else resp.read()
-                return body, resp.headers
-        except urllib.error.HTTPError as exc:
-            if exc.code in (429, 500, 502, 503, 504) and attempt < _retries - 1:
-                # Honor Retry-After (capped at 30s); else exp backoff.
-                retry_after = exc.headers.get("Retry-After") if exc.headers else None
-                delay = min(int(retry_after), 30) if (retry_after or "").isdigit() else 2 ** attempt
-                time.sleep(delay)
-                continue
-            raise
-        except (urllib.error.URLError, TimeoutError, OSError) as exc:
-            # A connect-phase failure is wrapped in URLError, but a timeout/reset
-            # during resp.read() raises socket.timeout (= TimeoutError, an
-            # OSError) which is NOT a URLError — so a stalled response body would
-            # otherwise escape this retry path and crash past main()'s HTTPError
-            # handler. Catch all three so a read-phase stall retries and wraps
-            # into the synthetic 599 that is_hard_http_error treats as hard.
-            if attempt < _retries - 1:
-                time.sleep(2 ** attempt)
-                continue
-            raise urllib.error.HTTPError(
-                url=url,
-                code=599,
-                msg=f"network error: {exc}",
-                hdrs=None,  # type: ignore[arg-type]
-                fp=None,
-            ) from exc
-    raise RuntimeError(f"_http_get_with_headers called with _retries={_retries}")
+    """GET `url` with bearer auth; return (body, response headers). Headers are
+    returned so paginated callers can follow GitHub's `Link: rel="next"` rather
+    than guessing the next page from page length. Retry/backoff and the
+    synthetic-599 contract live in _http_request."""
+    _status, body, headers = _http_request(
+        "GET", url, token, accept=accept, max_bytes=max_bytes, _retries=_retries
+    )
+    return body, headers
 
 
 def _http_send(
@@ -1928,10 +2837,30 @@ def _http_send(
     body: bytes | None,
     _retries: int = 3,
 ) -> tuple[int, bytes]:
-    """Issue `method url` with bearer auth; return (status, body). Same
-    retry/backoff and synthetic-599 contract as _http_get_with_headers (and
-    _OPENER strips Authorization on a cross-host redirect). Mirrors
-    regrade_repos.py's transport; used only for the team-repo grant PUT/GET."""
+    """Issue `method url` with bearer auth; return (status, body). The
+    write-side view of _http_request; used only for the team-repo grant
+    PUT/GET. Mirrors regrade_repos.py's transport."""
+    status, resp_body, _headers = _http_request(
+        method, url, token, accept=accept, body=body, _retries=_retries
+    )
+    return status, resp_body
+
+
+def _http_request(
+    method: str,
+    url: str,
+    token: str,
+    *,
+    accept: str,
+    body: bytes | None = None,
+    max_bytes: int | None = None,
+    _retries: int = 3,
+) -> tuple[int, bytes, Any]:
+    """The one transport: issue `method url` with bearer auth and return
+    (status, body, response headers). Retries 5xx/429 and throttled 403s with
+    backoff (see retry_delay). The custom redirect handler strips Authorization
+    before following GitHub's asset-download redirect to S3 (otherwise the
+    signed URL rejects the forwarded token)."""
     headers = {
         "Accept": accept,
         "Authorization": f"Bearer {token}",
@@ -1944,15 +2873,23 @@ def _http_send(
         req = urllib.request.Request(url, method=method, data=body, headers=headers)
         try:
             with _OPENER.open(req, timeout=30) as resp:
-                return resp.status, resp.read()
+                resp_body = (
+                    resp.read(max_bytes) if max_bytes is not None else resp.read()
+                )
+                return resp.status, resp_body, resp.headers
         except urllib.error.HTTPError as exc:
-            if exc.code in (429, 500, 502, 503, 504) and attempt < _retries - 1:
-                retry_after = exc.headers.get("Retry-After") if exc.headers else None
-                delay = min(int(retry_after), 30) if (retry_after or "").isdigit() else 2 ** attempt
+            delay = retry_delay(exc, attempt)
+            if delay is not None and attempt < _retries - 1:
                 time.sleep(delay)
                 continue
             raise
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            # A connect-phase failure is wrapped in URLError, but a timeout/reset
+            # during resp.read() raises socket.timeout (= TimeoutError, an
+            # OSError) which is NOT a URLError — so a stalled response body would
+            # otherwise escape this retry path and crash past main()'s HTTPError
+            # handler. Catch all three so a read-phase stall retries and wraps
+            # into the synthetic 599 that classify() treats as FATAL.
             if attempt < _retries - 1:
                 time.sleep(2 ** attempt)
                 continue
@@ -1963,7 +2900,7 @@ def _http_send(
                 hdrs=None,  # type: ignore[arg-type]
                 fp=None,
             ) from exc
-    raise RuntimeError(f"_http_send called with _retries={_retries}")
+    raise RuntimeError(f"_http_request called with _retries={_retries}")
 
 
 def team_has_repo_access(
@@ -1994,14 +2931,26 @@ def grant_team_repo(
     repo: str,
     permission: str,
     token: str,
+    *,
+    known_repos: set[str] | None = None,
 ) -> bool:
     """Grant `team_slug` `permission` on <repo_owner>/<repo> via
     PUT /orgs/{org}/teams/{slug}/repos/{owner}/{repo}, skipping the write when
     the team already has any access (idempotent). Returns whether a new grant was
     applied. Mirrors Go's grantTeamRepo. A 403 (token lacks Administration) or
-    599 propagates so main() aborts the run (is_hard_http_error); a 404/422 (repo
-    absent / not org-owned) is left for the caller to warn-and-skip."""
-    if team_has_repo_access(api_url, org, team_slug, repo_owner, repo, token):
+    599 propagates so main() aborts the run (classify -> FATAL); a 404/422 (repo
+    absent / not org-owned) is left for the caller to warn-and-skip.
+
+    `known_repos` is the team's repos already read in bulk (lowercased
+    `owner/repo`, see list_team_repo_full_names), which answers the idempotence
+    check without a request; None means unknown and costs the per-repo check."""
+    if known_repos is not None:
+        already_granted = f"{repo_owner}/{repo}".lower() in known_repos
+    else:
+        already_granted = team_has_repo_access(
+            api_url, org, team_slug, repo_owner, repo, token
+        )
+    if already_granted:
         return False
     url = (
         f"{api_url}/orgs/{urllib.parse.quote(org, safe='')}/teams/"
@@ -2018,13 +2967,155 @@ def grant_team_repo(
     return True
 
 
-def is_hard_http_error(exc: urllib.error.HTTPError) -> bool:
-    """Hard failures that should fail the whole run: 401/403 (bad/under-scoped
-    token) and 599 (synthetic "network unavailable" after retries). Treating
-    these as per-student "not submitted" would make a broken run report success
-    while collecting nothing.
+def error_body_snippet(exc: urllib.error.HTTPError) -> str:
+    """First 300 characters of an error response body, whitespace-collapsed
+    and cached on the exception so later readers (the retry decision, then the
+    log line) still see it after the stream is consumed. Empty when the body
+    can't be read.
+
+    Worth logging: a 403 without its body leaves "throttled or under-scoped?"
+    unanswerable."""
+    cached = getattr(exc, "_body_snippet", None)
+    if cached is None:
+        try:
+            # Bounded: only 300 chars survive, and the body can come from a
+            # proxy or the asset redirect rather than GitHub's small errors.
+            raw = exc.read(BODY_SNIPPET_READ_BYTES) or b""
+        except (OSError, ValueError, AttributeError):
+            raw = b""
+        cached = " ".join(raw.decode("utf-8", "replace").split())[:300]
+        setattr(exc, "_body_snippet", cached)
+    return cached
+
+
+def body_note(exc: urllib.error.HTTPError) -> str:
+    """error_body_snippet formatted for appending to a log line."""
+    snippet = error_body_snippet(exc)
+    return f" — response: {snippet}" if snippet else ""
+
+
+def rate_limit_verdict(
+    exc: urllib.error.HTTPError,
+) -> tuple[str, float | None] | None:
+    """`(reason, seconds-to-wait)` when the response says GitHub is THROTTLING
+    rather than refusing, else None. `seconds` is None for a throttle that must
+    NOT be waited out.
+
+    A rate limit arrives as 403 as often as 429, and only the response tells it
+    apart from an under-scoped token: a Retry-After header, an exhausted
+    X-RateLimit-Remaining, or a body naming the limit. One ladder decides reason
+    and delay together so they cannot disagree; rate_limit_reason and retry_delay
+    are its two views."""
+    if exc.code not in (403, 429):
+        return None
+    headers = exc.headers or {}
+    retry_after = _retry_after_seconds(headers)
+    if retry_after is not None:
+        # Bounded, so a mistaken or hostile header can't park the job.
+        return (
+            f"Retry-After: {retry_after}s",
+            min(int(retry_after), MAX_RETRY_SLEEP_SECONDS),
+        )
+    if (headers.get("X-RateLimit-Remaining") or "").strip() == "0":
+        # The primary hourly budget: its window runs up to an hour, so a named
+        # error beats a sleeping job.
+        reset = (headers.get("X-RateLimit-Reset") or "").strip()
+        window = f", resets at {epoch_to_iso(reset)}" if reset.isdigit() else ""
+        return (f"X-RateLimit-Remaining: 0{window}", None)
+    body = error_body_snippet(exc).lower()
+    for marker in RATE_LIMIT_BODY_MARKERS:
+        if marker in body:
+            return (
+                f'response body names the "{marker}"',
+                MAX_RETRY_SLEEP_SECONDS,
+            )
+    return None
+
+
+def rate_limit_reason(exc: urllib.error.HTTPError) -> str | None:
+    """What in the response says GitHub is THROTTLING rather than refusing, or
+    None when nothing does. The reason half of rate_limit_verdict."""
+    verdict = rate_limit_verdict(exc)
+    return verdict[0] if verdict is not None else None
+
+
+def epoch_to_iso(value: str) -> str:
+    """Unix epoch seconds (X-RateLimit-Reset) as an RFC 3339 UTC timestamp, or
+    the raw value when it doesn't name a representable time.
+
+    `.isdigit()` is not guard enough: GitHub occasionally sends a MILLISECOND
+    epoch, which overflows datetime. This runs inside an `except HTTPError`
+    block, so raising here would surface the throttle as a traceback."""
+    try:
+        return datetime.datetime.fromtimestamp(
+            int(value), tz=datetime.timezone.utc
+        ).strftime("%Y-%m-%dT%H:%M:%SZ")
+    except (ValueError, OverflowError, OSError):
+        return value
+
+
+def throttle_sleep_budget_spent(delay: float) -> bool:
+    """Whether waiting `delay` would exceed the run's throttle-sleep budget;
+    charges it when it fits.
+
+    A recovering throttle raises nothing, so the sleeps stay invisible until the
+    job timeout kills the run. This ceiling converts that into the named
+    THROTTLED error instead."""
+    global _throttle_sleep_spent
+    if _throttle_sleep_spent + delay > MAX_TOTAL_THROTTLE_SLEEP_SECONDS:
+        return True
+    _throttle_sleep_spent += delay
+    return False
+
+
+def _retry_after_seconds(headers: Any) -> str | None:
+    """The Retry-After header when it names plain delta-seconds, else None.
+    Callers apply their own cap."""
+    value = (headers.get("Retry-After") or "").strip() if headers else ""
+    return value if value.isdigit() else None
+
+
+def retry_delay(exc: urllib.error.HTTPError, attempt: int) -> float | None:
+    """Seconds to wait before retrying `exc`, or None when it must not be
+    retried.
+
+    A throttle waits what rate_limit_verdict decided, while the run's sleep
+    budget lasts. Anything else keeps the previous contract: 5xx and a
+    signal-less 429 honour Retry-After (capped) or back off exponentially; any
+    other status is terminal."""
+    verdict = rate_limit_verdict(exc)
+    if verdict is not None:
+        delay = verdict[1]
+        if delay is not None and throttle_sleep_budget_spent(delay):
+            return None
+        return delay
+    if exc.code in (429, 500, 502, 503, 504):
+        retry_after = _retry_after_seconds(exc.headers)
+        if retry_after is not None:
+            return min(int(retry_after), TRANSIENT_RETRY_CAP_SECONDS)
+        return 2 ** attempt
+    return None
+
+
+def classify(exc: urllib.error.HTTPError) -> str:
+    """The ONE verdict every error handler branches on, throttle checked FIRST.
+
+    THROTTLED — GitHub is rate limiting. The token is healthy and the work is
+        deferrable; never report it as a scope problem.
+    FATAL     — 401/403 (bad or under-scoped token) or 599 (synthetic
+        network-unavailable after retries). Aborts the run: treating these as
+        per-student "not submitted" would report a broken run as success.
+    SKIPPABLE — everything else (404 = not accepted yet, 422 = not org-owned).
+
+    NOTE a throttle is NOT fatal, so this alone is not a "propagate?" test:
+    handlers that warn-and-skip must re-raise a throttle too, which is why they
+    ask `classify(exc) is not SKIPPABLE`.
     """
-    return exc.code in (401, 403, 599)
+    if rate_limit_verdict(exc) is not None:
+        return THROTTLED
+    if exc.code in (401, 403, 599):
+        return FATAL
+    return SKIPPABLE
 
 
 # Workflow-command output -----------------------------------------------------
