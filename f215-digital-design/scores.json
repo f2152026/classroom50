@@ -3,8 +3,225 @@
   "assignments": {
     "dd-2026-verilog-labs": {
       "type": "individual",
-      "entries": [],
-      "collected_at": "2026-08-24T18:37:27Z"
+      "entries": [
+        {
+          "owner": "cogneudyn",
+          "first_name": "CNDL",
+          "submissions": [
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "f215-digital-design",
+              "assignment_type": "individual",
+              "owner": "cogneudyn",
+              "submission": "submit/2026-08-25T02-14-17Z-e0f77e3",
+              "commit": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-cogneudyn/commit/e0f77e346416f040cedd126bde551c3a59a28bff",
+              "release": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-cogneudyn/releases/tag/submit%2F2026-08-25T02-14-17Z-e0f77e3",
+              "review": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-cogneudyn/compare/1791e672a5b863adec0ec56cd3a7cf666484ecd7...e0f77e346416f040cedd126bde551c3a59a28bff",
+              "datetime": "2026-08-25T02:14:02Z",
+              "graded_at": "2026-08-25T02:14:40Z",
+              "score": 0,
+              "max-score": 80,
+              "tests": [
+                {
+                  "test-name": "Task 1 - Full Adder Gates Simulation",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 2 - 4-bit Ripple Carry Adder",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3a - 4-bit Ripple Carry Adder (rca)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3b - 4-bit Carry-Lookahead Adder (cla4)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3c - 4-bit Dataflow Carry-Lookahead Adder (cla4_dataflow)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4a - 64-bit Ripple Carry Adder (rca64)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4b - 64-bit Flat CLA (cla64_flat)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4c - 64-bit Blocked CLA (cla64_blocked)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gsaurabhr",
+                "id": 6485773
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "f215-digital-design",
+              "assignment_type": "individual",
+              "owner": "cogneudyn",
+              "submission": "submit/2026-08-25T02-11-33Z-a390aca",
+              "commit": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-cogneudyn/commit/a390aca5f1b0d2722b8ad379781353788ed6a394",
+              "release": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-cogneudyn/releases/tag/submit%2F2026-08-25T02-11-33Z-a390aca",
+              "review": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-cogneudyn/compare/1791e672a5b863adec0ec56cd3a7cf666484ecd7...a390aca5f1b0d2722b8ad379781353788ed6a394",
+              "datetime": "2026-08-25T02:11:18Z",
+              "graded_at": "2026-08-25T02:11:56Z",
+              "score": 0,
+              "max-score": 80,
+              "tests": [
+                {
+                  "test-name": "Task 1 - Full Adder Gates Simulation",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 2 - 4-bit Ripple Carry Adder",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3a - 4-bit Ripple Carry Adder (rca)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3b - 4-bit Carry-Lookahead Adder (cla4)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3c - 4-bit Dataflow Carry-Lookahead Adder (cla4_dataflow)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4a - 64-bit Ripple Carry Adder (rca64)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4b - 64-bit Flat CLA (cla64_flat)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4c - 64-bit Blocked CLA (cla64_blocked)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gsaurabhr",
+                "id": 6485773
+              }
+            }
+          ]
+        },
+        {
+          "owner": "f20241073-priyanshu",
+          "email": "f20241073@pilani.bits-pilani.ac.in",
+          "submissions": [
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "f215-digital-design",
+              "assignment_type": "individual",
+              "owner": "f20241073-priyanshu",
+              "submission": "submit/2026-08-24T20-53-17Z-22c760c",
+              "commit": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-f20241073-priyanshu/commit/22c760c22808516e0404ba38ffddc5584e04ebd7",
+              "release": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-f20241073-priyanshu/releases/tag/submit%2F2026-08-24T20-53-17Z-22c760c",
+              "review": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-f20241073-priyanshu/compare/53020f2305c3f77969a9a4886416a1042a122f3b...22c760c22808516e0404ba38ffddc5584e04ebd7",
+              "datetime": "2026-08-24T20:53:03Z",
+              "graded_at": "2026-08-24T20:53:46Z",
+              "score": 10,
+              "max-score": 80,
+              "tests": [
+                {
+                  "test-name": "Task 1 - Full Adder Gates Simulation",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 2 - 4-bit Ripple Carry Adder",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3a - 4-bit Ripple Carry Adder (rca)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3b - 4-bit Carry-Lookahead Adder (cla4)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3c - 4-bit Dataflow Carry-Lookahead Adder (cla4_dataflow)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4a - 64-bit Ripple Carry Adder (rca64)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4b - 64-bit Flat CLA (cla64_flat)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4c - 64-bit Blocked CLA (cla64_blocked)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "f20241073-priyanshu",
+                "id": 318814509
+              }
+            }
+          ]
+        }
+      ],
+      "collected_at": "2026-08-25T06:48:14Z"
     }
   }
 }
