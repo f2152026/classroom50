@@ -4439,9 +4439,153 @@
               }
             }
           ]
+        },
+        {
+          "owner": "TrojanJain",
+          "first_name": "Saksham",
+          "last_name": "Jain",
+          "email": "f20240836@pilani.bits-pilani.ac.in",
+          "submissions": [
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "f215-digital-design",
+              "assignment_type": "individual",
+              "owner": "trojanjain",
+              "submission": "submit/2026-08-25T20-07-19Z-068916a",
+              "commit": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-trojanjain/commit/068916ae34fd4bb08be53096c157f9658e213383",
+              "release": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-trojanjain/releases/tag/submit%2F2026-08-25T20-07-19Z-068916a",
+              "review": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-trojanjain/compare/1a4ee58a70f12f026447e0634aa0e9866e6b34db...068916ae34fd4bb08be53096c157f9658e213383",
+              "datetime": "2026-08-25T20:07:03Z",
+              "graded_at": "2026-08-25T20:07:46Z",
+              "score": 20,
+              "max-score": 80,
+              "tests": [
+                {
+                  "test-name": "Task 1 - Full Adder Gates Simulation",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 2 - 4-bit Ripple Carry Adder",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3a - 4-bit Ripple Carry Adder (rca)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3b - 4-bit Carry-Lookahead Adder (cla4)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3c - 4-bit Dataflow Carry-Lookahead Adder (cla4_dataflow)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4a - 64-bit Ripple Carry Adder (rca64)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4b - 64-bit Flat CLA (cla64_flat)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4c - 64-bit Blocked CLA (cla64_blocked)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "TrojanJain",
+                "id": 318751146
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "f215-digital-design",
+              "assignment_type": "individual",
+              "owner": "trojanjain",
+              "submission": "submit/2026-08-25T20-03-26Z-148bd4a",
+              "commit": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-trojanjain/commit/148bd4a5c2fa888197e14ab786330586b2eed3b5",
+              "release": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-trojanjain/releases/tag/submit%2F2026-08-25T20-03-26Z-148bd4a",
+              "review": "https://github.com/f2152026/f215-digital-design-dd-2026-verilog-labs-trojanjain/compare/1a4ee58a70f12f026447e0634aa0e9866e6b34db...148bd4a5c2fa888197e14ab786330586b2eed3b5",
+              "datetime": "2026-08-25T20:03:11Z",
+              "graded_at": "2026-08-25T20:03:53Z",
+              "score": 10,
+              "max-score": 80,
+              "tests": [
+                {
+                  "test-name": "Task 1 - Full Adder Gates Simulation",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 2 - 4-bit Ripple Carry Adder",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3a - 4-bit Ripple Carry Adder (rca)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3b - 4-bit Carry-Lookahead Adder (cla4)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3c - 4-bit Dataflow Carry-Lookahead Adder (cla4_dataflow)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4a - 64-bit Ripple Carry Adder (rca64)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4b - 64-bit Flat CLA (cla64_flat)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4c - 64-bit Blocked CLA (cla64_blocked)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "TrojanJain",
+                "id": 318751146
+              }
+            }
+          ]
         }
       ],
-      "collected_at": "2026-08-25T16:45:39Z"
+      "collected_at": "2026-08-26T04:01:19Z"
     }
   }
 }
