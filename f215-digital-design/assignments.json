@@ -14,6 +14,13 @@
         "repo": "verilog-labs",
         "branch": "main"
       },
+      "due": "2026-08-31T06:30:00Z",
+      "due_meta": {
+        "input": "2026-08-31T12:00:00",
+        "zone": "Asia/Calcutta",
+        "offset": "+05:30",
+        "source": "auto-detected"
+      },
       "available_from": "2026-08-24T18:29:00Z",
       "available_from_meta": {
         "input": "2026-08-24T23:59:00",
