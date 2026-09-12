@@ -3,8 +3,8 @@ name: Publish Pages
 # Allow-list publisher: only the paths enumerated under "Assemble Pages
 # artifact" appear in the deployed site, so a new file dropped into the
 # repo is private by default. Triggers are intentionally limited to
-# push to the org default branch and workflow_dispatch — never
-# pull_request — so a fork PR cannot modify this workflow to leak
+# push to the org default branch and workflow_dispatch (never
+# pull_request), so a fork PR cannot modify this workflow to leak
 # private paths. main is substituted at skeleton commit
 # time by `gh teacher init`.
 
@@ -21,9 +21,14 @@ permissions:
   pages: write
   id-token: write
 
+# queue: max lets every publish wait its turn; the default single-slot queue
+# cancels the middle run when three saves land close together. Keep
+# cancel-in-progress false: a cancelled deploy can leave its Pages deployment
+# in progress, which blocks the next one for up to 10 minutes.
 concurrency:
   group: pages
   cancel-in-progress: false
+  queue: max
 
 jobs:
   build:
@@ -80,7 +85,7 @@ jobs:
           # Per-classroom config files, published under the classroom's
           # dest prefix (plain or secret-protected). classroom default
           # autograder (`<classroom>/autograder.py`) is published only when
-          # the classroom has run `gh teacher autograder set-default` —
+          # the classroom has run `gh teacher autograder set-default`;
           # absence is fine, the runner falls back to a vacuous-pass
           # result when neither per-assignment nor classroom default
           # is published.
@@ -151,7 +156,7 @@ jobs:
         run: |
           python3 - <<'PY'
           import glob, json, os
-          # Public fields only — keep internal/teacher-side keys (e.g., the
+          # Public fields only: keep internal/teacher-side keys (e.g., the
           # `team` block, which carries the GitHub team id/slug) out of the
           # unauthenticated Pages index. New public fields must be added
           # here explicitly rather than dumping classroom.json wholesale.
