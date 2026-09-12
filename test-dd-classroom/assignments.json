@@ -405,7 +405,53 @@
           "iverilog"
         ]
       },
-      "submission_mode": "every-push"
+      "tests": [
+        {
+          "name": "Task 1 - 2-to-1 MUX Simulation",
+          "type": "io",
+          "run": "./scripts/run.sh lab02 task1 labs/lab02/task1/tb.v",
+          "points": 20,
+          "setup": "./scripts/compile.sh lab02 task1 labs/lab02/task1/tb.v",
+          "comparison": "included",
+          "expected": "Simulation complete:"
+        },
+        {
+          "name": "Task 2 - Parameterized ROM Lookup Table",
+          "type": "io",
+          "run": "./scripts/run.sh lab02 task2 labs/lab02/task2/tb.v",
+          "points": 20,
+          "setup": "./scripts/compile.sh lab02 task2 labs/lab02/task2/tb.v",
+          "comparison": "included",
+          "expected": "Simulation complete:"
+        },
+        {
+          "name": "Task 3 - 2-bit Magnitude Comparator",
+          "type": "io",
+          "run": "./scripts/run.sh lab02 task3 labs/lab02/task3/tb.v",
+          "points": 20,
+          "setup": "./scripts/compile.sh lab02 task3 labs/lab02/task3/tb.v",
+          "comparison": "included",
+          "expected": "Simulation complete:"
+        },
+        {
+          "name": "Task 4 - Delay Placement Semantics",
+          "type": "io",
+          "run": "./scripts/run.sh lab02 task4 labs/lab02/task4/tb.v",
+          "points": 20,
+          "setup": "./scripts/compile.sh lab02 task4 labs/lab02/task4/tb.v",
+          "comparison": "included",
+          "expected": "Simulation complete:"
+        },
+        {
+          "name": "Task 5 - Capstone ALU (alu)",
+          "type": "io",
+          "run": "./scripts/run.sh lab02 task5 labs/lab02/task5/tb.v",
+          "points": 10,
+          "setup": "./scripts/compile.sh lab02 task5 labs/lab02/task5/tb.v",
+          "comparison": "included",
+          "expected": "Simulation complete:"
+        }
+      ]
     },
     {
       "slug": "verilog-lab",
