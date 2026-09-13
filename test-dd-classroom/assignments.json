@@ -126,6 +126,10 @@
           "comparison": "included",
           "expected": "Simulation complete:"
         }
+      ],
+      "submission_mode": "tag",
+      "submission_tags": [
+        "submit-*"
       ]
     },
     {
