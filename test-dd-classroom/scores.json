@@ -1991,6 +1991,506 @@
               "classroom": "test-dd-classroom",
               "assignment_type": "individual",
               "owner": "gengar-fan",
+              "submission": "submit/2026-09-13T17-30-35Z-641a9fa",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/641a9fa608616195d36617fff9d3ae49c96b960a",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-13T17-30-35Z-641a9fa",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/compare/a99769f2acb20c71822ec6173a70c95d9a7a296a...641a9fa608616195d36617fff9d3ae49c96b960a",
+              "datetime": "2026-09-13T17:30:18Z",
+              "graded_at": "2026-09-13T17:31:07Z",
+              "score": 90,
+              "max-score": 90,
+              "tests": [
+                {
+                  "test-name": "Task 1 - 2-to-1 MUX Simulation",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 2 - Parameterized ROM Lookup Table",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3 - 2-bit Magnitude Comparator",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 4 - Delay Placement Semantics",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 5 - Capstone ALU (alu)",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-09-13T17-27-03Z-da709fe",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/da709fe1d41d415037dc888d960f9e6df6f27546",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-13T17-27-03Z-da709fe",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/compare/a99769f2acb20c71822ec6173a70c95d9a7a296a...da709fe1d41d415037dc888d960f9e6df6f27546",
+              "datetime": "2026-09-13T17:26:13Z",
+              "graded_at": "2026-09-13T17:27:25Z",
+              "score": 90,
+              "max-score": 90,
+              "tests": [
+                {
+                  "test-name": "Task 1 - 2-to-1 MUX Simulation",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 2 - Parameterized ROM Lookup Table",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3 - 2-bit Magnitude Comparator",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 4 - Delay Placement Semantics",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 5 - Capstone ALU (alu)",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-09-13T17-26-06Z-d07a430",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/d07a43005320e8a0908c551081856958000396b1",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-13T17-26-06Z-d07a430",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/compare/a99769f2acb20c71822ec6173a70c95d9a7a296a...d07a43005320e8a0908c551081856958000396b1",
+              "datetime": "2026-09-13T17:25:51Z",
+              "graded_at": "2026-09-13T17:26:37Z",
+              "score": 90,
+              "max-score": 90,
+              "tests": [
+                {
+                  "test-name": "Task 1 - 2-to-1 MUX Simulation",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 2 - Parameterized ROM Lookup Table",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3 - 2-bit Magnitude Comparator",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 4 - Delay Placement Semantics",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 5 - Capstone ALU (alu)",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-09-13T17-25-10Z-33877f4",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/33877f4defc000af1753c6e53e360836d1469c0e",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-13T17-25-10Z-33877f4",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/compare/a99769f2acb20c71822ec6173a70c95d9a7a296a...33877f4defc000af1753c6e53e360836d1469c0e",
+              "datetime": "2026-09-13T17:24:54Z",
+              "graded_at": "2026-09-13T17:25:36Z",
+              "score": 90,
+              "max-score": 90,
+              "tests": [
+                {
+                  "test-name": "Task 1 - 2-to-1 MUX Simulation",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 2 - Parameterized ROM Lookup Table",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3 - 2-bit Magnitude Comparator",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 4 - Delay Placement Semantics",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 5 - Capstone ALU (alu)",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-09-13T17-24-04Z-f3ec82c",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/f3ec82c32007cd64542652309ba7e0eb1ee59b9d",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-13T17-24-04Z-f3ec82c",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/compare/a99769f2acb20c71822ec6173a70c95d9a7a296a...f3ec82c32007cd64542652309ba7e0eb1ee59b9d",
+              "datetime": "2026-09-13T17:23:49Z",
+              "graded_at": "2026-09-13T17:24:25Z",
+              "score": 90,
+              "max-score": 90,
+              "tests": [
+                {
+                  "test-name": "Task 1 - 2-to-1 MUX Simulation",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 2 - Parameterized ROM Lookup Table",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3 - 2-bit Magnitude Comparator",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 4 - Delay Placement Semantics",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 5 - Capstone ALU (alu)",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-09-13T16-58-58Z-d54ec97",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/d54ec978d9cfd8c4cb1538c59826c28e7222813a",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-13T16-58-58Z-d54ec97",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/compare/a99769f2acb20c71822ec6173a70c95d9a7a296a...d54ec978d9cfd8c4cb1538c59826c28e7222813a",
+              "datetime": "2026-09-13T16:58:44Z",
+              "graded_at": "2026-09-13T16:59:23Z",
+              "score": 90,
+              "max-score": 90,
+              "tests": [
+                {
+                  "test-name": "Task 1 - 2-to-1 MUX Simulation",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 2 - Parameterized ROM Lookup Table",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3 - 2-bit Magnitude Comparator",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 4 - Delay Placement Semantics",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 5 - Capstone ALU (alu)",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-09-13T16-55-56Z-5930363",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/5930363b0a7673b22eeb3720f34a2b3ea59fb207",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-13T16-55-56Z-5930363",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/compare/a99769f2acb20c71822ec6173a70c95d9a7a296a...5930363b0a7673b22eeb3720f34a2b3ea59fb207",
+              "datetime": "2026-09-13T16:55:39Z",
+              "graded_at": "2026-09-13T16:56:20Z",
+              "score": 80,
+              "max-score": 90,
+              "tests": [
+                {
+                  "test-name": "Task 1 - 2-to-1 MUX Simulation",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 2 - Parameterized ROM Lookup Table",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3 - 2-bit Magnitude Comparator",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 4 - Delay Placement Semantics",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 5 - Capstone ALU (alu)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-09-13T16-51-00Z-49fbc9c",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/49fbc9c12a532257bb84e82a49e7251cecb38d45",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-13T16-51-00Z-49fbc9c",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/compare/a99769f2acb20c71822ec6173a70c95d9a7a296a...49fbc9c12a532257bb84e82a49e7251cecb38d45",
+              "datetime": "2026-09-13T16:50:44Z",
+              "graded_at": "2026-09-13T16:51:25Z",
+              "score": 60,
+              "max-score": 90,
+              "tests": [
+                {
+                  "test-name": "Task 1 - 2-to-1 MUX Simulation",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 2 - Parameterized ROM Lookup Table",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3 - 2-bit Magnitude Comparator",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 4 - Delay Placement Semantics",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 5 - Capstone ALU (alu)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-09-13T16-48-23Z-5e19d9a",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/5e19d9a891935a10f9ce65ddd88a0dca94a70720",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-13T16-48-23Z-5e19d9a",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/compare/a99769f2acb20c71822ec6173a70c95d9a7a296a...5e19d9a891935a10f9ce65ddd88a0dca94a70720",
+              "datetime": "2026-09-13T16:48:05Z",
+              "graded_at": "2026-09-13T16:48:45Z",
+              "score": 40,
+              "max-score": 90,
+              "tests": [
+                {
+                  "test-name": "Task 1 - 2-to-1 MUX Simulation",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 2 - Parameterized ROM Lookup Table",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3 - 2-bit Magnitude Comparator",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 4 - Delay Placement Semantics",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 5 - Capstone ALU (alu)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-09-13T16-42-22Z-910fe18",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/910fe1861d1e39ad961213644c69d3ac729580ed",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-13T16-42-22Z-910fe18",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/compare/a99769f2acb20c71822ec6173a70c95d9a7a296a...910fe1861d1e39ad961213644c69d3ac729580ed",
+              "datetime": "2026-09-13T16:42:07Z",
+              "graded_at": "2026-09-13T16:42:44Z",
+              "score": 20,
+              "max-score": 90,
+              "tests": [
+                {
+                  "test-name": "Task 1 - 2-to-1 MUX Simulation",
+                  "passed": true,
+                  "score": 20,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 2 - Parameterized ROM Lookup Table",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3 - 2-bit Magnitude Comparator",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 4 - Delay Placement Semantics",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 5 - Capstone ALU (alu)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              }
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
               "submission": "submit/2026-09-12T09-03-14Z-69a7b8a",
               "commit": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/commit/69a7b8a038e0d2877f52cf2bc293f0225415e025",
               "release": "https://github.com/f2152026/test-dd-classroom-verilog-gengar-fan/releases/tag/submit%2F2026-09-12T09-03-14Z-69a7b8a",
@@ -2089,7 +2589,7 @@
           ]
         }
       ],
-      "collected_at": "2026-09-13T16:28:13Z",
+      "collected_at": "2026-09-13T17:33:15Z",
       "detected": []
     }
   }
