@@ -1531,6 +1531,213 @@
               "classroom": "test-dd-classroom",
               "assignment_type": "individual",
               "owner": "abhyu2302",
+              "submission": "submit/2026-08-25T12-42-40Z-2be0a75",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/commit/2be0a754ba2abb90426a1217b19e836a2e0d8a01",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/releases/tag/submit%2F2026-08-25T12-42-40Z-2be0a75",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/compare/ad554b69d6c63b6f02771e53e8cbbebc4df3c973...2be0a754ba2abb90426a1217b19e836a2e0d8a01",
+              "datetime": "2026-08-25T12:42:23Z",
+              "graded_at": "2026-08-25T12:43:10Z",
+              "score": 10,
+              "max-score": 100,
+              "tests": [
+                {
+                  "test-name": "Task 1 - Full Adder Gates Simulation",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 2 - 4-bit Ripple Carry Adder",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3a - 4-bit Ripple Carry Adder (rca)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3b - 4-bit Carry-Lookahead Adder (cla4)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3c - 4-bit Dataflow Carry-Lookahead Adder (cla4_dataflow)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4a - 64-bit Ripple Carry Adder (rca64)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4b - 64-bit Flat CLA (cla64_flat)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 15
+                },
+                {
+                  "test-name": "Task 4c - 64-bit Blocked CLA (cla64_blocked)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 15
+                }
+              ],
+              "submitted_by": {
+                "username": "abhyu2302",
+                "id": 227550633
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "abhyu2302",
+              "submission": "submit/2026-08-25T04-50-14Z-dd0ce0a",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/commit/dd0ce0a7a5e442cce798356fff89f5ac183003f0",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/releases/tag/submit%2F2026-08-25T04-50-14Z-dd0ce0a",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/compare/ad554b69d6c63b6f02771e53e8cbbebc4df3c973...dd0ce0a7a5e442cce798356fff89f5ac183003f0",
+              "datetime": "2026-08-25T04:50:01Z",
+              "graded_at": "2026-08-25T04:50:43Z",
+              "score": 10,
+              "max-score": 100,
+              "tests": [
+                {
+                  "test-name": "Task 1 - Full Adder Gates Simulation",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 2 - 4-bit Ripple Carry Adder",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3a - 4-bit Ripple Carry Adder (rca)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3b - 4-bit Carry-Lookahead Adder (cla4)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3c - 4-bit Dataflow Carry-Lookahead Adder (cla4_dataflow)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4a - 64-bit Ripple Carry Adder (rca64)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4b - 64-bit Flat CLA (cla64_flat)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 15
+                },
+                {
+                  "test-name": "Task 4c - 64-bit Blocked CLA (cla64_blocked)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 15
+                }
+              ],
+              "submitted_by": {
+                "username": "abhyu2302",
+                "id": 227550633
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "abhyu2302",
+              "submission": "submit/2026-08-25T04-38-49Z-d5e877f",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/commit/d5e877f36d21f3c821a565a78f539bf34a7f87a1",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/releases/tag/submit%2F2026-08-25T04-38-49Z-d5e877f",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/compare/ad554b69d6c63b6f02771e53e8cbbebc4df3c973...d5e877f36d21f3c821a565a78f539bf34a7f87a1",
+              "datetime": "2026-08-25T04:38:31Z",
+              "graded_at": "2026-08-25T04:39:15Z",
+              "score": 0,
+              "max-score": 100,
+              "tests": [
+                {
+                  "test-name": "Task 1 - Full Adder Gates Simulation",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 2 - 4-bit Ripple Carry Adder",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3a - 4-bit Ripple Carry Adder (rca)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3b - 4-bit Carry-Lookahead Adder (cla4)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3c - 4-bit Dataflow Carry-Lookahead Adder (cla4_dataflow)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4a - 64-bit Ripple Carry Adder (rca64)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4b - 64-bit Flat CLA (cla64_flat)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 15
+                },
+                {
+                  "test-name": "Task 4c - 64-bit Blocked CLA (cla64_blocked)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 15
+                }
+              ],
+              "submitted_by": {
+                "username": "abhyu2302",
+                "id": 227550633
+              },
+              "late": false
+            },
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "abhyu2302",
               "submission": "submit/2026-08-24T14-43-45Z-544b3db",
               "commit": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/commit/544b3dba5ce6cd27ca4274b7ee75eb77442b06cf",
               "release": "https://github.com/f2152026/test-dd-classroom-verilog-lab-abhyu2302/releases/tag/submit%2F2026-08-24T14-43-45Z-544b3db",
@@ -1665,9 +1872,85 @@
               "late": false
             }
           ]
+        },
+        {
+          "owner": "gengar-fan",
+          "first_name": "Gengar-fan",
+          "submissions": [
+            {
+              "schema": "classroom50/result/v1",
+              "classroom": "test-dd-classroom",
+              "assignment_type": "individual",
+              "owner": "gengar-fan",
+              "submission": "submit/2026-08-28T12-07-17Z-4315c65",
+              "commit": "https://github.com/f2152026/test-dd-classroom-verilog-lab-gengar-fan/commit/4315c656a6e87a2280866fe722ebdab199a54ae7",
+              "release": "https://github.com/f2152026/test-dd-classroom-verilog-lab-gengar-fan/releases/tag/submit%2F2026-08-28T12-07-17Z-4315c65",
+              "review": "https://github.com/f2152026/test-dd-classroom-verilog-lab-gengar-fan/compare/34e45c2b5138db099f02da4dbb6f27711d3cc5b9...4315c656a6e87a2280866fe722ebdab199a54ae7",
+              "datetime": "2026-08-28T12:07:04Z",
+              "graded_at": "2026-08-28T12:07:40Z",
+              "score": 10,
+              "max-score": 100,
+              "tests": [
+                {
+                  "test-name": "Task 1 - Full Adder Gates Simulation",
+                  "passed": true,
+                  "score": 10,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 2 - 4-bit Ripple Carry Adder",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 20
+                },
+                {
+                  "test-name": "Task 3a - 4-bit Ripple Carry Adder (rca)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3b - 4-bit Carry-Lookahead Adder (cla4)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 3c - 4-bit Dataflow Carry-Lookahead Adder (cla4_dataflow)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4a - 64-bit Ripple Carry Adder (rca64)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 10
+                },
+                {
+                  "test-name": "Task 4b - 64-bit Flat CLA (cla64_flat)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 15
+                },
+                {
+                  "test-name": "Task 4c - 64-bit Blocked CLA (cla64_blocked)",
+                  "passed": false,
+                  "score": 0,
+                  "max-score": 15
+                }
+              ],
+              "submitted_by": {
+                "username": "gengar-fan",
+                "id": 315069451
+              },
+              "late": false
+            }
+          ]
         }
       ],
-      "collected_at": "2026-08-24T17:05:41Z"
+      "collected_at": "2026-09-13T16:27:21Z",
+      "detected": []
     }
   }
 }
