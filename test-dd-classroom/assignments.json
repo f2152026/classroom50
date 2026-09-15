@@ -68,9 +68,9 @@
         "repo": "verilog-labs",
         "branch": "main"
       },
-      "available_from": "2026-08-23T04:37:00Z",
+      "available_from": "2026-08-24T04:37:00Z",
       "available_from_meta": {
-        "input": "2026-08-23T10:07:00",
+        "input": "2026-08-24T10:07:00",
         "zone": "Asia/Calcutta",
         "offset": "+05:30",
         "source": "auto-detected"
