@@ -21,7 +21,6 @@
         "offset": "+05:30",
         "source": "auto-detected"
       },
-      "locked": true,
       "runtime": {
         "apt": [
           "iverilog"
