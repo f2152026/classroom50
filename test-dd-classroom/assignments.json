@@ -127,7 +127,8 @@
           "expected": "Simulation complete:"
         }
       ]
-    },
+    ,
+      "submission_mode": "every-push"},
     {
       "slug": "verilog-lab",
       "name": "verilog-lab-_",
