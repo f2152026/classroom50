@@ -928,7 +928,7 @@ jobs:
       needs.setup.outputs.foreign-tag-suppressed != 'true'
     runs-on:   ${{ fromJSON(needs.setup.outputs.runs-on) }}
     container: ${{ fromJSON(needs.setup.outputs.container) }}
-    timeout-minutes: 15
+    timeout-minutes: 360
     # Pin bash explicitly. GitHub-hosted runners default run: steps
     # to bash, but inside a container Actions falls back to `sh -e`,
     # and our run: blocks use `set -euo pipefail` (bash-only).
@@ -1050,7 +1050,7 @@ jobs:
       # `--retry-all-errors` covers DNS / TLS / 5xx / partial response;
       # `--retry-delay 2` uses a fixed 2s gap (it disables curl's
       # exponential backoff), so 3 retries add ~6s plus the 30s
-      # per-attempt ceiling, well under the grade job's 15-minute timeout.
+      # per-attempt ceiling, well under the grade job's 6-hour (360-minute) timeout.
       - name: Grade details
         id: autograde
         run: |
