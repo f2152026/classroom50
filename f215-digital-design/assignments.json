@@ -40,7 +40,6 @@
           "run": "./scripts/run.sh lab02 task1 labs/lab02/task1/tb.v",
           "points": 20,
           "setup": "./scripts/compile.sh lab02 task1 labs/lab02/task1/tb.v",
-          "timeout": 30,
           "comparison": "included",
           "expected": "Simulation complete:"
         },
@@ -50,7 +49,6 @@
           "run": "./scripts/run.sh lab02 task2 labs/lab02/task2/tb.v",
           "points": 20,
           "setup": "./scripts/compile.sh lab02 task2 labs/lab02/task2/tb.v",
-          "timeout": 30,
           "comparison": "included",
           "expected": "Simulation complete:"
         },
@@ -60,7 +58,6 @@
           "run": "./scripts/run.sh lab02 task3 labs/lab02/task3/tb.v",
           "points": 20,
           "setup": "./scripts/compile.sh lab02 task3 labs/lab02/task3/tb.v",
-          "timeout": 30,
           "comparison": "included",
           "expected": "Simulation complete:"
         },
@@ -70,7 +67,6 @@
           "run": "./scripts/run.sh lab02 task4 labs/lab02/task4/tb.v",
           "points": 20,
           "setup": "./scripts/compile.sh lab02 task4 labs/lab02/task4/tb.v",
-          "timeout": 30,
           "comparison": "included",
           "expected": "Simulation complete:"
         },
@@ -80,11 +76,13 @@
           "run": "./scripts/run.sh lab02 task5 labs/lab02/task5/tb.v",
           "points": 20,
           "setup": "./scripts/compile.sh lab02 task5 labs/lab02/task5/tb.v",
-          "timeout": 30,
           "comparison": "included",
           "expected": "Simulation complete:"
         }
-      ]
+      ],
+      "test_defaults": {
+        "show-output": true
+      }
     }
   ]
 }
