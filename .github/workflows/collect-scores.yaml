@@ -71,7 +71,7 @@ jobs:
     # cancel-in-progress: false a wedged git operation would otherwise hold the
     # same-classroom concurrency slot until GitHub's ~6h default, stalling every
     # queued scoped/org-wide run behind it. Fail loudly instead.
-    timeout-minutes: 30
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v7
 

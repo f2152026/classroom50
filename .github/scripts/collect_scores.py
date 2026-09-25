@@ -140,7 +140,7 @@ TRANSIENT_RETRY_CAP_SECONDS = 30
 # spend the workflow's `timeout-minutes` and the job is killed mid-run: no
 # summary, no scores.json, no diagnosis. Spending the budget instead surfaces
 # the throttle through the named THROTTLED path.
-MAX_TOTAL_THROTTLE_SLEEP_SECONDS = 300
+MAX_TOTAL_THROTTLE_SLEEP_SECONDS = 14400
 
 _throttle_sleep_spent = 0.0
 # Wall-clock accounting for the budget above. Bulk listings sleep out a
@@ -4139,6 +4139,44 @@ def _http_send(
     return status, resp_body
 
 
+_last_ratelimit_remaining: int = 5000
+_last_ratelimit_reset: int = 0
+
+
+def _record_response_ratelimit(headers: Any) -> None:
+    global _last_ratelimit_remaining, _last_ratelimit_reset
+    if not headers:
+        return
+    rem = (headers.get("X-RateLimit-Remaining") or "").strip()
+    rst = (headers.get("X-RateLimit-Reset") or "").strip()
+    with _transport_lock:
+        if rem.isdigit():
+            _last_ratelimit_remaining = int(rem)
+        if rst.isdigit():
+            _last_ratelimit_reset = int(rst)
+
+
+def _check_quota_and_sleep() -> None:
+    global _last_ratelimit_remaining, _last_ratelimit_reset
+    with _transport_lock:
+        rem = _last_ratelimit_remaining
+        rst = _last_ratelimit_reset
+    # If remaining quota is low (under 50 calls) or we did roughly 4500+ calls, pause and sleep until window resets
+    if (rem <= 50 or (_request_count > 0 and _request_count % 4500 == 0)) and rst > 0:
+        now = int(time.time())
+        sleep_sec = max(5, rst - now + 15)
+        if sleep_sec > 5:
+            print(
+                f"\n[Classroom 50 Rate Limiter] Transaction quota checkpoint: {rem} calls remaining ({_request_count} requests issued). "
+                f"Pausing collection to sleep for {sleep_sec // 60}m {sleep_sec % 60}s until reset window at {epoch_to_iso(str(rst))}...",
+                flush=True,
+            )
+            time.sleep(sleep_sec)
+            with _transport_lock:
+                _last_ratelimit_remaining = 5000
+            print(f"[Classroom 50 Rate Limiter] Quota reset window elapsed. Resuming collection with fresh quota!\n", flush=True)
+
+
 def _http_request(
     method: str,
     url: str,
@@ -4147,7 +4185,7 @@ def _http_request(
     accept: str,
     body: bytes | None = None,
     max_bytes: int | None = None,
-    _retries: int = 3,
+    _retries: int = 5,
 ) -> tuple[int, bytes, Any]:
     """The one transport: issue `method url` with bearer auth and return
     (status, body, response headers). Retries 5xx/429 and throttled 403s with
@@ -4163,6 +4201,7 @@ def _http_request(
     if body is not None:
         headers["Content-Type"] = "application/json"
     for attempt in range(_retries):
+        _check_quota_and_sleep()
         req = urllib.request.Request(url, method=method, data=body, headers=headers)
         _count_request()
         try:
@@ -4170,10 +4209,16 @@ def _http_request(
                 resp_body = (
                     resp.read(max_bytes) if max_bytes is not None else resp.read()
                 )
+                _record_response_ratelimit(resp.headers)
                 return resp.status, resp_body, resp.headers
         except urllib.error.HTTPError as exc:
             delay = retry_delay(exc, attempt)
             if delay is not None and attempt < _retries - 1:
+                reason = rate_limit_reason(exc) or str(exc)
+                print(
+                    f"[Classroom 50 Rate Limiter] Throttled on {method} {url} ({reason}). Sleeping for {delay:.0f}s before retry...",
+                    flush=True,
+                )
                 time.sleep(delay)
                 continue
             raise
@@ -4334,11 +4379,13 @@ def rate_limit_verdict(
             min(int(retry_after), MAX_RETRY_SLEEP_SECONDS),
         )
     if (headers.get("X-RateLimit-Remaining") or "").strip() == "0":
-        # The primary hourly budget: its window runs up to an hour, so a named
-        # error beats a sleeping job.
+        # The primary hourly budget: sleep until the reset timestamp
         reset = (headers.get("X-RateLimit-Reset") or "").strip()
         window = f", resets at {epoch_to_iso(reset)}" if reset.isdigit() else ""
-        return (f"X-RateLimit-Remaining: 0{window}", None)
+        if reset.isdigit():
+            delay = max(5.0, float(int(reset) - int(time.time()) + 15))
+            return (f"X-RateLimit-Remaining: 0{window}", delay)
+        return (f"X-RateLimit-Remaining: 0{window}", 2400.0)
     body = error_body_snippet(exc).lower()
     for marker in RATE_LIMIT_BODY_MARKERS:
         if marker in body:
